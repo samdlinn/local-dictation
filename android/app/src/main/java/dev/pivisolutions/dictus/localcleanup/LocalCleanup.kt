@@ -1,6 +1,7 @@
 package dev.pivisolutions.dictus.localcleanup
 
 import android.content.Context
+import android.app.ActivityManager
 import com.arm.aichat.AiChat
 import com.arm.aichat.InferenceEngine
 import dev.pivisolutions.dictus.core.text.LocalCleanupPolicy
@@ -77,6 +78,10 @@ object LocalCleanup {
 
     suspend fun cleanOrOriginal(context: Context, text: String): String {
         if (!enabled(context) || !ready(context) || text.isBlank() || text.length > 6000) return text
+        val memory = ActivityManager.MemoryInfo()
+        (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(memory)
+        // Keep the speech transcript instead of risking a process kill during JNI allocation.
+        if (memory.lowMemory || memory.availMem < 3_000_000_000L) return text
         return try {
             withTimeout(45000) {
                 mutex.withLock {

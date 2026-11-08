@@ -1,5 +1,16 @@
 # AGENTS.md
 
+## Local Dictation fork
+
+This repository is the independent Local Dictation product. The desktop source below derives from Handy; `android/` derives from Dictus and includes an OpenWispr/llama.cpp local inference module. Keep all upstream license notices and use this project's original microphone branding.
+
+- No paid services, app accounts, API keys, or cloud inference. The production desktop cleanup path is `local_cleanup.rs`; the legacy HTTP inference client is intentionally blocked.
+- Build the embedded offline runtime with `python3 scripts/prepare-local-runtime.py` before packaging. Model downloads are not Git source.
+- Never commit private signing keys, user data, downloaded speech models, or cleanup model weights.
+- Run the new cleanup policy tests, frontend lint/type build, and packaged executable smoke tests. Android needs physical-device checks before claiming end-to-end support.
+- Public downloads belong in GitHub Releases. Source builds are optional for users. Keep unsigned-installation limitations and alpha status clear.
+- The upstream contribution and feature-freeze instructions at the end apply only when sending changes to cjpais/Handy. They do not require extra approval for work authorized in this independent repository.
+
 This file provides guidance to AI coding assistants working with code in this repository.
 
 ## Development Commands

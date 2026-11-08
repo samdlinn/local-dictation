@@ -1,0 +1,70 @@
+name: Publish checked alpha packages
+on:
+  workflow_run:
+    workflows: ['Build apps']
+    types: [completed]
+permissions:
+  contents: read
+jobs:
+  publish:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: release-artifacts
+      - name: Publish verified packages for their source tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+          BUILD_RUN_ID: ${{ github.event.workflow_run.id }}
+          REPOSITORY: ${{ github.repository }}
+        shell: python
+        run: |
+          import hashlib, json, os, pathlib, re, shutil, subprocess
+          repository = os.environ['REPOSITORY']
+          sha = os.environ['SOURCE_SHA']
+          refs = json.loads(subprocess.check_output(['gh', 'api', f'repos/{repository}/git/matching-refs/tags/v']))
+          tags = []
+          for ref in refs:
+              tag = ref['ref'].removeprefix('refs/tags/')
+              if not re.fullmatch(r'v\d+\.\d+\.\d+-alpha\.\d+', tag):
+                  continue
+              obj = ref['object']
+              if obj['type'] == 'tag':
+                  obj = json.loads(subprocess.check_output(['gh','api',f"repos/{repository}/git/tags/{obj['sha']}"]))['object']
+              if obj['sha'] == sha:
+                  tags.append(tag)
+          if not tags:
+              raise SystemExit('No alpha tag points at this checked source; nothing published.')
+          tag = sorted(tags, key=lambda value: tuple(map(int, re.findall(r'\d+', value))))[-1]
+          output = pathlib.Path('release-dist')
+          output.mkdir()
+          assets = []
+          allowed = {'.dmg', '.exe', '.deb', '.AppImage', '.apk'}
+          for path in pathlib.Path('release-artifacts').rglob('*'):
+              if not path.is_file() or path.suffix not in allowed:
+                  continue
+              name = path.name.replace('_aarch64.dmg', '_arm64.dmg')
+              if path.suffix == '.apk':
+                  name = f'LocalDictation_{tag.removeprefix("v")}_android-arm64.apk'
+              destination = output / name
+              shutil.copy2(path, destination)
+              digest = hashlib.sha256(destination.read_bytes()).hexdigest()
+              assets.append({'file': name, 'sha256': digest, 'source_commit': sha})
+          assert {pathlib.Path(item['file']).suffix for item in assets} == allowed, 'A required platform package is missing'
+          (output/'SHA256SUMS.txt').write_text(''.join(f"{item['sha256']}  {item['file']}\n" for item in assets), encoding='utf-8')
+          (output/'release-manifest.json').write_text(json.dumps({'product':'Local Dictation','release':tag,'source_commit':sha,'build_run':f'https://github.com/{repository}/actions/runs/{os.environ["BUILD_RUN_ID"]}','artifacts':assets,'physical_device_validation':'Required before claiming microphone, keyboard, or paste compatibility on a specific device'},indent=2)+'\n',encoding='utf-8')
+          exists = subprocess.run(['gh','release','view',tag,'--repo',repository],capture_output=True).returncode == 0
+          if not exists:
+              subprocess.run(['gh','release','create',tag,'--repo',repository,'--verify-tag','--prerelease','--title',f'Local Dictation {tag}','--notes-file','docs/RELEASE_NOTES.md'],check=True)
+          subprocess.run(['gh','release','upload',tag,'--repo',repository,'--clobber',*[str(path) for path in output.iterdir()]],check=True)
+          subprocess.run(['gh','release','edit',tag,'--repo',repository,'--notes-file','docs/RELEASE_NOTES.md'],check=True)

@@ -16,16 +16,16 @@
     "general": "Algemeen",
     "models": "Modellen",
     "advanced": "Geavanceerd",
-    "postProcessing": "Naverwerking",
+    "postProcessing": "Local cleanup",
     "history": "Geschiedenis",
     "debug": "Probleemoplossing",
-    "about": "Over Handy"
+    "about": "Over Local Dictation"
   },
   "onboarding": {
     "customModelDescription": "Niet officieel ondersteund",
     "migration": {
       "title": "Je modellen moeten worden bijgewerkt",
-      "description": "Handy gebruikt nu een nieuwer soort model. Download de nieuwe versie om te blijven transcriberen. Oude versies worden verwijderd.",
+      "description": "Local Dictation gebruikt nu een nieuwer soort model. Download de nieuwe versie om te blijven transcriberen. Oude versies worden verwijderd.",
       "replaces": "Vervangt {{name}}",
       "oldFormat": "Oud formaat",
       "failed": "Downloaden mislukt",
@@ -62,11 +62,11 @@
     "permissions": {
       "microphone": {
         "name": "Microfoon",
-        "why": "Zodat Handy je kan horen. Audio wordt op deze computer omgezet in tekst en nooit geüpload."
+        "why": "Zodat Local Dictation je kan horen. Audio wordt op deze computer omgezet in tekst en nooit geüpload."
       },
       "accessibility": {
         "name": "Toegankelijkheid",
-        "why": "Zodat je sneltoets in elke app werkt en Handy de tekst kan typen waar je cursor staat."
+        "why": "Zodat je sneltoets in elke app werkt en Local Dictation de tekst kan typen waar je cursor staat."
       },
       "errors": {
         "checkFailed": "Machtigingen controleren mislukt. Probeer het opnieuw.",
@@ -80,12 +80,12 @@
       "openSettings": "Instellingen openen",
       "allowed": "Toegestaan",
       "waiting": "Wachten",
-      "turnOnMac": "Zet Handy aan in Systeeminstellingen en kom dan hier terug.",
+      "turnOnMac": "Zet Local Dictation aan in Systeeminstellingen en kom dan hier terug.",
       "turnOnWindows": "Zet toegang tot de microfoon aan in Windows-instellingen en kom dan hier terug.",
       "hintBoth": "Sta beide toe om door te gaan",
       "hintMicrophone": "Sta de microfoon toe om door te gaan",
       "welcomeBack": "Welkom terug. We gaan verder waar je was gebleven.",
-      "relaunch": "Reageert de sneltoets hierna niet? <relaunch>Start Handy opnieuw</relaunch> en je komt direct weer hier uit."
+      "relaunch": "Reageert de sneltoets hierna niet? <relaunch>Start Local Dictation opnieuw</relaunch> en je komt direct weer hier uit."
     },
     "shell": {
       "back": "Terug",
@@ -96,11 +96,11 @@
       "title": "Praat in plaats van typen, in elke app",
       "subtitle": "Kies de talen waarin je gaat dicteren",
       "languagesLabel": "Talen",
-      "noMatch": "Geen taal gevonden voor „{{query}}”. De modellen van Handy dekken ongeveer 100 talen; meer vind je in de instellingen.",
+      "noMatch": "Geen taal gevonden voor „{{query}}”. De modellen van Local Dictation dekken ongeveer 100 talen; meer vind je in de instellingen.",
       "appLanguage": "App-taal",
       "menusIn": "Menu’s in het <b>{{language}}</b>",
       "chinese": {
-        "question": "Je spreekt {{languages}}. Welke tekens moet Handy schrijven?",
+        "question": "Je spreekt {{languages}}. Welke tekens moet Local Dictation schrijven?",
         "label": "Chinese tekens",
         "zh-Hans": "Vereenvoudigd",
         "zh-Hant": "Taiwan",
@@ -170,7 +170,7 @@
     },
     "try": {
       "title": "Probeer het maar!",
-      "subtitle": "Handy staat in de hoek om je er doorheen te helpen",
+      "subtitle": "Local Dictation staat in de hoek om je er doorheen te helpen",
       "noteLabel": "Notitie",
       "placeholder": "Nieuwe notitie",
       "hold": "Houd <keys/> ingedrukt en praat.",
@@ -198,14 +198,14 @@
     },
     "done": {
       "title": "Alles is klaar",
-      "subMac": "Handy staat nu in je menubalk. Houd <keys/> ingedrukt of tik erop in elke app om te praten.",
-      "subTray": "Handy staat nu in je systeemvak. Houd <keys/> ingedrukt of tik erop in elke app om te praten.",
+      "subMac": "Local Dictation staat nu in je menubalk. Houd <keys/> ingedrukt of tik erop in elke app om te praten.",
+      "subTray": "Local Dictation staat nu in je systeemvak. Houd <keys/> ingedrukt of tik erop in elke app om te praten.",
       "hint": "Je kunt dit later wijzigen in de instellingen",
       "highFiveLabel": "High five",
-      "atLogin": "Handy starten als ik inlog",
+      "atLogin": "Local Dictation starten als ik inlog",
       "finish": "Klaar",
       "panel": {
-        "name": "Handy",
+        "name": "Local Dictation",
         "ready": "Klaar",
         "languages": "Talen",
         "model": "Spraakmodel",
@@ -372,7 +372,7 @@
       },
       "preferredLanguages": {
         "title": "Voorkeurstalen",
-        "description": "De talen die je spreekt. Handy gebruikt ze om modellen aan te bevelen.",
+        "description": "De talen die je spreekt. Local Dictation gebruikt ze om modellen aan te bevelen.",
         "noMatch": "Geen taal gevonden voor „{{query}}”",
         "weak": "Geen enkel model herkent {{languages}} al goed."
       },
@@ -399,17 +399,17 @@
         "fits": "Voor jouw talen",
         "untested": "Niet getest"
       },
-      "untestedNote": "Niet getest met Handy. Ze kunnen langzamer zijn of meer fouten maken.",
+      "untestedNote": "Niet getest met Local Dictation. Ze kunnen langzamer zijn of meer fouten maken.",
       "untestedHidden_one": "{{count}} ander model is niet afgestemd op dicteren. Zoek om het te vinden.",
       "untestedHidden_other": "{{count}} andere modellen zijn niet afgestemd op dicteren. Zoek om er een te vinden.",
-      "emptyYours": "Nog geen modellen. Kies hieronder een model: het wordt gedownload en daarna gebruikt Handy het.",
+      "emptyYours": "Nog geen modellen. Kies hieronder een model: het wordt gedownload en daarna gebruikt Local Dictation het.",
       "showMore": "{{count}} meer tonen",
       "showFewer": "Minder tonen",
       "download": "Downloaden en gebruiken",
       "downloadingThenUse": "{{percent}}% van {{total}}, daarna wordt overgeschakeld",
       "loading": "Laden…",
       "deleteAsk": "{{name}} verwijderen? Dit maakt {{size}} vrij.",
-      "deleteAskActive": "{{name}} verwijderen? Handy kan niet transcriberen totdat je een ander model kiest.",
+      "deleteAskActive": "{{name}} verwijderen? Local Dictation kan niet transcriberen totdat je een ander model kiest.",
       "cancel": "Annuleren",
       "deleteModel": "{{name}} verwijderen",
       "cancelDownload": "Downloaden van {{name}} stoppen",
@@ -423,14 +423,14 @@
         "marks": "? is nog niet gemeten. — verstaat die taal niet."
       },
       "retiredNotice": {
-        "title": "Oude modellen werken niet meer met Handy",
+        "title": "Oude modellen werken niet meer met Local Dictation",
         "description": "Ze nemen {{size}} in beslag op je computer.",
         "delete": "Modellen verwijderen",
         "deleteFailed": "Sommige oude modellen konden niet worden verwijderd. Bekijk het logboek voor details."
       },
       "rescan": {
         "label": "Opnieuw scannen",
-        "tooltip": "Scannen naar modellen die buiten Handy om zijn toegevoegd aan de modellenmap of Hugging Face-cache"
+        "tooltip": "Scannen naar modellen die buiten Local Dictation om zijn toegevoegd aan de modellenmap of Hugging Face-cache"
       }
     },
     "languages": {
@@ -500,11 +500,11 @@
       },
       "autostart": {
         "label": "Starten bij opstarten",
-        "description": "Handy automatisch starten zodra je inlogt op je computer."
+        "description": "Local Dictation automatisch starten zodra je inlogt op je computer."
       },
       "showTrayIcon": {
         "label": "Pictogram in systeemvak tonen",
-        "description": "Toon het Handy-pictogram in het systeemvak."
+        "description": "Toon het Local Dictation-pictogram in het systeemvak."
       },
       "overlay": {
         "style": {
@@ -741,7 +741,7 @@
       },
       "updateChecks": {
         "label": "Controleren op updates",
-        "description": "Automatisch controleren op nieuwe versies van Handy",
+        "description": "Automatisch controleren op nieuwe versies van Local Dictation",
         "lockedDescription": "Uitgeschakeld door systeemconfiguratie (HANDY_DISABLE_UPDATER)"
       },
       "whatsNewPreview": {
@@ -847,7 +847,7 @@
       },
       "keyboardDiagnostic": {
         "title": "Toetsenborddiagnose",
-        "description": "Controleert of toetsenbordgebeurtenissen Handy bereiken. Alleen het aantal gebeurtenissen wordt vastgelegd — nooit welke toetsen je indrukt.",
+        "description": "Controleert of toetsenbordgebeurtenissen Local Dictation bereiken. Alleen het aantal gebeurtenissen wordt vastgelegd — nooit welke toetsen je indrukt.",
         "run": "Diagnose van 10 s uitvoeren",
         "running": "Luisteren… druk je sneltoets een paar keer in (bijv. Option+Space)",
         "secureInputLabel": "Secure Input",
@@ -861,24 +861,24 @@
         "mouse": "Muis",
         "verdictBlocked": "Secure Input blokkeert toetsgebeurtenissen — sneltoetsen met een gewone toets kunnen pas weer werken als dit is opgelost.",
         "verdictSuspicious": "Er kwamen wel modificatiegebeurtenissen binnen, maar geen toetsgebeurtenissen — iets onderdrukt toetsen terwijl Secure Input als uitgeschakeld wordt gemeld. Meld dit op GitHub.",
-        "verdictOk": "Toetsgebeurtenissen bereiken Handy normaal.",
+        "verdictOk": "Toetsgebeurtenissen bereiken Local Dictation normaal.",
         "verdictNoEvents": "Geen gebeurtenissen vastgelegd — heb je tijdens de test toetsen ingedrukt?",
         "failed": "Diagnose mislukt: {{error}}"
       }
     },
     "about": {
-      "title": "Over Handy",
+      "title": "Over Local Dictation",
       "version": {
         "title": "Versie",
-        "description": "Huidige versie van Handy"
+        "description": "Huidige versie van Local Dictation"
       },
       "whatsNewUpdates": {
         "label": "Toon 'Wat is er nieuw'",
-        "description": "Release-notes tonen nadat Handy is bijgewerkt"
+        "description": "Release-notes tonen nadat Local Dictation is bijgewerkt"
       },
       "appDataDirectory": {
         "title": "App-datamap",
-        "description": "Locatie waar Handy de gegevens opslaat"
+        "description": "Locatie waar Local Dictation de gegevens opslaat"
       },
       "sourceCode": {
         "title": "Broncode",
@@ -887,7 +887,7 @@
       },
       "supportDevelopment": {
         "title": "Ontwikkeling ondersteunen",
-        "description": "Help ons om te blijven bouwen aan Handy",
+        "description": "Help ons om te blijven bouwen aan Local Dictation",
         "button": "Doneren"
       },
       "acknowledgments": {
@@ -895,7 +895,7 @@
         "ggml": {
           "title": "ggml",
           "description": "Krachtige tensorbibliotheek voor lokale AI-verwerking",
-          "details": "Handy's lokale spraak-naar-tekst is gebouwd op transcribe.cpp en ggml. Met dank aan het geweldige werk van Georgi Gerganov en alle bijdragers."
+          "details": "Local Dictation's lokale spraak-naar-tekst is gebouwd op transcribe.cpp en ggml. Met dank aan het geweldige werk van Georgi Gerganov en alle bijdragers."
         }
       }
     }
@@ -916,7 +916,7 @@
     "portableUpdateBrowseButton": "GitHub Releases openen"
   },
   "whatsNew": {
-    "title": "Nieuw in Handy v{{version}}"
+    "title": "Nieuw in Local Dictation v{{version}}"
   },
   "common": {
     "playbackPosition": "Afspeelpositie",
@@ -941,7 +941,7 @@
     "noInputDeviceTitle": "Geen microfoon gevonden",
     "noInputDevice": "Er is geen audio-invoerapparaat gedetecteerd. Sluit een microfoon of headset aan en probeer het opnieuw.",
     "recordingFailedTitle": "Opname starten mislukt",
-    "modelLoadFailed": "Handy kon dit model niet laden. Probeer het opnieuw of kies een ander model.",
+    "modelLoadFailed": "Local Dictation kon dit model niet laden. Probeer het opnieuw of kies een ander model.",
     "modelLoadFailedTitle": "Model laden mislukt",
     "modelDownloadFailed": "Downloaden mislukt",
     "pasteFailedTitle": "Tekst plakken mislukt",
@@ -962,11 +962,11 @@
   },
   "appLanguage": {
     "title": "Interfacetaal",
-    "description": "Wijzig de taal van de Handy-interface"
+    "description": "Wijzig de taal van de Local Dictation-interface"
   },
   "theme": {
     "title": "App-thema",
-    "description": "Kies of Handy het systeemthema volgt of licht of donker blijft",
+    "description": "Kies of Local Dictation het systeemthema volgt of licht of donker blijft",
     "options": {
       "system": "Systeem",
       "light": "Licht",
@@ -988,5 +988,23 @@
     "learnMore": "Hoe je dit oplost",
     "recorderBlocked": "Sneltoetsen kunnen nu niet worden opgenomen — Secure Input van macOS blokkeert toetsgebeurtenissen. Los eerst de Secure Input-waarschuwing op.",
     "dismiss": "Sluiten"
+  },
+  "product": {
+    "name": "Local Dictation"
+  },
+  "localCleanup": {
+    "title": "Local cleanup",
+    "description": "Clean up dictation on this device. No account, API key, or cloud service. The optional Qwen3 model downloads once and then works offline.",
+    "runtimeMissing": "This build does not include the cleanup engine. Dictation still works.",
+    "ready": "Cleanup model is ready on this device.",
+    "needsModel": "Optional download: 1.83 GB. Keep at least 3 GB free.",
+    "download": "Download free cleanup model",
+    "downloading": "Downloading… {{progress}}%",
+    "enable": "Clean up my dictation automatically",
+    "fallback": "If cleanup is unavailable, too slow, or changes too much, your original transcript is inserted. Review important names and numbers.",
+    "shortcut": "Shortcut for dictation with cleanup",
+    "try": "Try cleanup without the microphone",
+    "input": "Enter some dictated text to try",
+    "preview": "Clean up text"
   }
 }

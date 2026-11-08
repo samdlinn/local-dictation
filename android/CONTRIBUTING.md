@@ -1,0 +1,43 @@
+# Contributing to Dictus
+
+Thanks for your interest in contributing! This guide covers everything you need to build and contribute to the project.
+
+## Prerequisites
+
+- JDK 17
+- Android SDK (API 36 target, API 29 minimum)
+- Android NDK 27.2 (required for whisper.cpp and sherpa-onnx native builds)
+
+## Build
+
+```bash
+git clone https://github.com/getdictus/dictus-android.git
+cd dictus-android
+./gradlew assembleDebug
+```
+
+Debug builds target ARM devices (arm64-v8a, armeabi-v7a). To run the app on an x86_64 emulator, add `-Pdictus.emulatorAbi=true`: whisper.cpp and the keyboard trie are then also built for x86_64 (debug only). Parakeet (sherpa-onnx) ships ARM libraries only and is unavailable on the emulator.
+
+Native libraries must support 16 KB memory pages (Google Play, Android 15+). `:whisper` and `:trie` link their 64-bit libraries with 16 KB LOAD segments, and `assemble*` / `bundle*` fail when a 64-bit `.so` in the APK or AAB is aligned below 16 KB, or is compressed in the APK (`checkDebugApkNativeAlignment`, report in `app/build/reports/native-alignment/`). A new native dependency has to ship 16 KB aligned libraries.
+
+## Module Map
+
+| Module | Purpose | Key entry point |
+|--------|---------|-----------------|
+| `app` | Main app UI, onboarding, settings, model manager | `MainActivity.kt` |
+| `ime` | System keyboard, suggestion bar, recording UI | `DictusImeService.kt` |
+| `core` | Shared models, design system, STT interface | `SttProvider.kt` |
+| `whisper` | Whisper.cpp JNI bridge and native libs | `WhisperProvider.kt` |
+| `asr` | Sherpa-onnx Kotlin API and Parakeet provider | `ParakeetProvider.kt` |
+
+## Testing
+
+- Run unit tests: `./gradlew test` (debug and release variants; `:app` runs debug only)
+- To test the keyboard on a device: enable Dictus in **Settings > System > Languages & input > On-screen keyboard > Manage on-screen keyboards**, then switch to it in any text field
+
+## Contributing Guidelines
+
+- Branch naming: `type/description` (e.g., `fix/keyboard-crash`, `feat/emoji-search`)
+- Commit messages: Conventional Commits suggested (`feat:`, `fix:`, `docs:`) but not enforced
+- Code language: English for comments and variable names; UI strings bilingual FR+EN via `strings.xml`
+- All PRs require maintainer review or a documented delegated review before merge. Validation evidence must follow [`docs/testing-validation-policy-research.md`](docs/testing-validation-policy-research.md).

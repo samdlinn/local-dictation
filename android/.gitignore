@@ -1,0 +1,28 @@
+# Gradle
+.gradle/
+build/
+.kotlin/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Android
+local.properties
+.cxx/
+*.apk
+*.aab
+
+# IDE
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Signing keystore — never commit
+*.jks
+*.keystore
+keystore.properties
+
+# Asset builder download cache
+.cache/
+tools/__pycache__/

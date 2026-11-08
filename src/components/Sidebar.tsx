@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Cog, FlaskConical, History, Info, Sparkles, Cpu } from "lucide-react";
+import { LocalCleanupSettings } from "./settings/post-processing/LocalCleanupSettings";
 import HandyTextLogo from "./icons/HandyTextLogo";
 import HandyHand from "./icons/HandyHand";
 import { useSettings } from "../hooks/useSettings";
@@ -9,7 +10,6 @@ import {
   AdvancedSettings,
   HistorySettings,
   AboutSettings,
-  PostProcessingSettings,
   ModelsSettings,
 } from "./settings";
 
@@ -59,8 +59,8 @@ export const SECTIONS_CONFIG = {
   postprocessing: {
     labelKey: "sidebar.postProcessing",
     icon: Sparkles,
-    component: PostProcessingSettings,
-    enabled: (settings) => settings?.post_process_enabled ?? false,
+    component: LocalCleanupSettings,
+    enabled: () => true,
   },
   debug: {
     labelKey: "sidebar.debug",

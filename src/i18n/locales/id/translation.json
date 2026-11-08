@@ -16,7 +16,7 @@
     "general": "Umum",
     "models": "Model",
     "advanced": "Lanjutan",
-    "postProcessing": "Pascaproses",
+    "postProcessing": "Local cleanup",
     "history": "Riwayat",
     "debug": "Debug",
     "about": "Tentang"
@@ -25,7 +25,7 @@
     "customModelDescription": "Tidak didukung secara resmi",
     "migration": {
       "title": "Model Anda perlu diperbarui",
-      "description": "Handy kini menggunakan jenis model yang lebih baru. Unduh versi baru untuk terus mentranskripsi. Versi lama akan dihapus.",
+      "description": "Local Dictation kini menggunakan jenis model yang lebih baru. Unduh versi baru untuk terus mentranskripsi. Versi lama akan dihapus.",
       "replaces": "Menggantikan {{name}}",
       "oldFormat": "Format lama",
       "failed": "Unduhan gagal",
@@ -62,11 +62,11 @@
     "permissions": {
       "microphone": {
         "name": "Mikrofon",
-        "why": "Agar Handy dapat mendengar Anda. Audio diubah menjadi teks di komputer ini dan tidak pernah diunggah."
+        "why": "Agar Local Dictation dapat mendengar Anda. Audio diubah menjadi teks di komputer ini dan tidak pernah diunggah."
       },
       "accessibility": {
         "name": "Aksesibilitas",
-        "why": "Agar pintasan Anda berfungsi di semua aplikasi, dan Handy dapat mengetik teks di tempat kursor Anda berada."
+        "why": "Agar pintasan Anda berfungsi di semua aplikasi, dan Local Dictation dapat mengetik teks di tempat kursor Anda berada."
       },
       "errors": {
         "checkFailed": "Gagal memeriksa izin. Silakan coba lagi.",
@@ -80,12 +80,12 @@
       "openSettings": "Buka pengaturan",
       "allowed": "Diizinkan",
       "waiting": "Menunggu",
-      "turnOnMac": "Aktifkan Handy di Pengaturan Sistem, lalu kembali ke sini.",
+      "turnOnMac": "Aktifkan Local Dictation di Pengaturan Sistem, lalu kembali ke sini.",
       "turnOnWindows": "Aktifkan akses mikrofon di Setelan Windows, lalu kembali ke sini.",
       "hintBoth": "Izinkan keduanya untuk melanjutkan",
       "hintMicrophone": "Izinkan mikrofon untuk melanjutkan",
       "welcomeBack": "Selamat datang kembali. Kita lanjutkan dari tadi.",
-      "relaunch": "Pintasan tidak merespons setelah ini? <relaunch>Luncurkan ulang Handy</relaunch> dan Anda akan kembali tepat ke sini."
+      "relaunch": "Pintasan tidak merespons setelah ini? <relaunch>Luncurkan ulang Local Dictation</relaunch> dan Anda akan kembali tepat ke sini."
     },
     "shell": {
       "back": "Kembali",
@@ -96,11 +96,11 @@
       "title": "Bicara, bukan mengetik, di aplikasi apa pun",
       "subtitle": "Pilih bahasa yang akan Anda gunakan untuk mendikte",
       "languagesLabel": "Bahasa",
-      "noMatch": "Tidak ada bahasa yang cocok dengan “{{query}}”. Model Handy mencakup sekitar 100 bahasa; sisanya ada di pengaturan.",
+      "noMatch": "Tidak ada bahasa yang cocok dengan “{{query}}”. Model Local Dictation mencakup sekitar 100 bahasa; sisanya ada di pengaturan.",
       "appLanguage": "Bahasa aplikasi",
       "menusIn": "Menu dalam <b>{{language}}</b>",
       "chinese": {
-        "question": "Anda berbicara {{languages}}. Aksara mana yang harus ditulis Handy?",
+        "question": "Anda berbicara {{languages}}. Aksara mana yang harus ditulis Local Dictation?",
         "label": "Aksara Mandarin",
         "zh-Hans": "Sederhana",
         "zh-Hant": "Taiwan",
@@ -170,7 +170,7 @@
     },
     "try": {
       "title": "Coba sekarang!",
-      "subtitle": "Handy ada di pojok untuk memandu Anda",
+      "subtitle": "Local Dictation ada di pojok untuk memandu Anda",
       "noteLabel": "Catatan",
       "placeholder": "Catatan baru",
       "hold": "Tahan <keys/> dan bicara.",
@@ -198,14 +198,14 @@
     },
     "done": {
       "title": "Semua siap",
-      "subMac": "Handy kini ada di bilah menu Anda. Tahan atau ketuk <keys/> di aplikasi apa pun untuk bicara.",
-      "subTray": "Handy kini ada di baki sistem Anda. Tahan atau ketuk <keys/> di aplikasi apa pun untuk bicara.",
+      "subMac": "Local Dictation kini ada di bilah menu Anda. Tahan atau ketuk <keys/> di aplikasi apa pun untuk bicara.",
+      "subTray": "Local Dictation kini ada di baki sistem Anda. Tahan atau ketuk <keys/> di aplikasi apa pun untuk bicara.",
       "hint": "Anda dapat mengubahnya nanti di Pengaturan",
       "highFiveLabel": "Tos",
-      "atLogin": "Jalankan Handy saat saya masuk",
+      "atLogin": "Jalankan Local Dictation saat saya masuk",
       "finish": "Selesai",
       "panel": {
-        "name": "Handy",
+        "name": "Local Dictation",
         "ready": "Siap",
         "languages": "Bahasa",
         "model": "Model ucapan",
@@ -330,7 +330,7 @@
     "general": {
       "title": "Umum",
       "shortcut": {
-        "title": "Pintasan Handy",
+        "title": "Pintasan Local Dictation",
         "description": "Atur pintasan keyboard untuk memulai perekaman ucapan-ke-teks",
         "loading": "Memuat pintasan...",
         "none": "Belum ada pintasan yang diatur",
@@ -372,7 +372,7 @@
       },
       "preferredLanguages": {
         "title": "Bahasa Pilihan",
-        "description": "Bahasa yang Anda gunakan. Handy memakainya untuk merekomendasikan model.",
+        "description": "Bahasa yang Anda gunakan. Local Dictation memakainya untuk merekomendasikan model.",
         "noMatch": "Tidak ada bahasa yang cocok dengan “{{query}}”",
         "weak": "Belum ada model yang mengenali {{languages}} dengan baik."
       },
@@ -399,17 +399,17 @@
         "fits": "Untuk bahasa Anda",
         "untested": "Belum diuji"
       },
-      "untestedNote": "Belum diuji dengan Handy. Mungkin lebih lambat atau lebih banyak salah.",
+      "untestedNote": "Belum diuji dengan Local Dictation. Mungkin lebih lambat atau lebih banyak salah.",
       "untestedHidden_one": "{{count}} model lagi tidak disetel untuk dikte. Cari untuk menemukannya.",
       "untestedHidden_other": "{{count}} model lagi tidak disetel untuk dikte. Cari untuk menemukannya.",
-      "emptyYours": "Belum ada model. Pilih satu di bawah: model diunduh, lalu Handy menggunakannya.",
+      "emptyYours": "Belum ada model. Pilih satu di bawah: model diunduh, lalu Local Dictation menggunakannya.",
       "showMore": "Tampilkan {{count}} lagi",
       "showFewer": "Tampilkan lebih sedikit",
       "download": "Unduh dan gunakan",
       "downloadingThenUse": "{{percent}}% dari {{total}}, lalu beralih",
       "loading": "Memuat…",
       "deleteAsk": "Hapus {{name}}? Ini membebaskan {{size}}.",
-      "deleteAskActive": "Hapus {{name}}? Handy tidak dapat mentranskripsi sampai Anda memilih model lain.",
+      "deleteAskActive": "Hapus {{name}}? Local Dictation tidak dapat mentranskripsi sampai Anda memilih model lain.",
       "cancel": "Batal",
       "deleteModel": "Hapus {{name}}",
       "cancelDownload": "Hentikan unduhan {{name}}",
@@ -423,14 +423,14 @@
         "marks": "? belum diukur. — tidak mengenali bahasa itu."
       },
       "retiredNotice": {
-        "title": "Model lama tidak lagi berfungsi dengan Handy",
+        "title": "Model lama tidak lagi berfungsi dengan Local Dictation",
         "description": "Model tersebut memakan {{size}} di komputer Anda.",
         "delete": "Hapus model",
         "deleteFailed": "Beberapa model lama tidak dapat dihapus. Periksa log untuk detailnya."
       },
       "rescan": {
         "label": "Pindai Ulang",
-        "tooltip": "Pindai ulang model yang ditambahkan ke folder model atau cache Hugging Face dari luar Handy"
+        "tooltip": "Pindai ulang model yang ditambahkan ke folder model atau cache Hugging Face dari luar Local Dictation"
       }
     },
     "languages": {
@@ -500,11 +500,11 @@
       },
       "autostart": {
         "label": "Jalankan saat Komputer Dinyalakan",
-        "description": "Mulai Handy secara otomatis saat Anda masuk ke komputer."
+        "description": "Mulai Local Dictation secara otomatis saat Anda masuk ke komputer."
       },
       "showTrayIcon": {
         "label": "Tampilkan Ikon Baki Sistem",
-        "description": "Tampilkan ikon Handy di baki sistem."
+        "description": "Tampilkan ikon Local Dictation di baki sistem."
       },
       "overlay": {
         "style": {
@@ -741,7 +741,7 @@
       },
       "updateChecks": {
         "label": "Periksa Pembaruan",
-        "description": "Periksa versi baru Handy secara otomatis",
+        "description": "Periksa versi baru Local Dictation secara otomatis",
         "lockedDescription": "Dinonaktifkan oleh konfigurasi sistem (HANDY_DISABLE_UPDATER)"
       },
       "whatsNewPreview": {
@@ -847,7 +847,7 @@
       },
       "keyboardDiagnostic": {
         "title": "Diagnostik Keyboard",
-        "description": "Memeriksa apakah peristiwa keyboard mencapai Handy. Hanya jumlah peristiwa yang dicatat — bukan tombol yang Anda tekan.",
+        "description": "Memeriksa apakah peristiwa keyboard mencapai Local Dictation. Hanya jumlah peristiwa yang dicatat — bukan tombol yang Anda tekan.",
         "run": "Jalankan diagnostik 10 dtk",
         "running": "Mendengarkan… tekan pintasan Anda beberapa kali (mis. Option+Space)",
         "secureInputLabel": "Secure Input",
@@ -861,7 +861,7 @@
         "mouse": "Mouse",
         "verdictBlocked": "Secure Input memblokir peristiwa tombol — pintasan keyboard tidak dapat berfungsi sampai masalah ini diselesaikan.",
         "verdictSuspicious": "Peristiwa tombol pengubah diterima, tetapi tidak ada peristiwa tombol — sesuatu memblokir input tombol meskipun Secure Input dilaporkan nonaktif. Harap laporkan ini di GitHub.",
-        "verdictOk": "Peristiwa tombol mencapai Handy secara normal.",
+        "verdictOk": "Peristiwa tombol mencapai Local Dictation secara normal.",
         "verdictNoEvents": "Tidak ada peristiwa yang tertangkap — apakah Anda menekan tombol selama pengujian?",
         "failed": "Diagnostik gagal: {{error}}"
       }
@@ -870,15 +870,15 @@
       "title": "Tentang",
       "version": {
         "title": "Versi",
-        "description": "Versi Handy saat ini"
+        "description": "Versi Local Dictation saat ini"
       },
       "whatsNewUpdates": {
         "label": "Tampilkan Yang Baru",
-        "description": "Tampilkan catatan rilis setelah Handy diperbarui"
+        "description": "Tampilkan catatan rilis setelah Local Dictation diperbarui"
       },
       "appDataDirectory": {
         "title": "Direktori Data Aplikasi",
-        "description": "Lokasi Handy menyimpan datanya"
+        "description": "Lokasi Local Dictation menyimpan datanya"
       },
       "sourceCode": {
         "title": "Kode Sumber",
@@ -887,7 +887,7 @@
       },
       "supportDevelopment": {
         "title": "Dukung Pengembangan",
-        "description": "Bantu kami terus mengembangkan Handy",
+        "description": "Bantu kami terus mengembangkan Local Dictation",
         "button": "Donasi"
       },
       "acknowledgments": {
@@ -895,7 +895,7 @@
         "ggml": {
           "title": "ggml",
           "description": "Pustaka tensor berkinerja tinggi untuk inferensi pembelajaran mesin di perangkat",
-          "details": "Fitur ucapan-ke-teks lokal Handy dibangun menggunakan transcribe.cpp dan ggml. Terima kasih kepada Georgi Gerganov dan para kontributor atas karya luar biasa mereka."
+          "details": "Fitur ucapan-ke-teks lokal Local Dictation dibangun menggunakan transcribe.cpp dan ggml. Terima kasih kepada Georgi Gerganov dan para kontributor atas karya luar biasa mereka."
         }
       }
     }
@@ -916,7 +916,7 @@
     "portableUpdateBrowseButton": "Buka GitHub Releases"
   },
   "whatsNew": {
-    "title": "Baru di Handy v{{version}}"
+    "title": "Baru di Local Dictation v{{version}}"
   },
   "common": {
     "playbackPosition": "Posisi pemutaran",
@@ -941,7 +941,7 @@
     "noInputDeviceTitle": "Mikrofon Tidak Ditemukan",
     "noInputDevice": "Tidak ada perangkat masukan audio yang terdeteksi. Hubungkan mikrofon atau headset lalu coba lagi.",
     "recordingFailedTitle": "Gagal Memulai Perekaman",
-    "modelLoadFailed": "Handy tidak dapat memuat model ini. Coba lagi atau pilih model lain.",
+    "modelLoadFailed": "Local Dictation tidak dapat memuat model ini. Coba lagi atau pilih model lain.",
     "modelLoadFailedTitle": "Gagal Memuat Model",
     "modelDownloadFailed": "Unduhan gagal",
     "pasteFailedTitle": "Gagal Menempelkan Teks",
@@ -962,11 +962,11 @@
   },
   "appLanguage": {
     "title": "Bahasa Aplikasi",
-    "description": "Ubah bahasa antarmuka Handy"
+    "description": "Ubah bahasa antarmuka Local Dictation"
   },
   "theme": {
     "title": "Tema Aplikasi",
-    "description": "Pilih apakah Handy mengikuti tema sistem atau selalu menggunakan tema terang atau gelap",
+    "description": "Pilih apakah Local Dictation mengikuti tema sistem atau selalu menggunakan tema terang atau gelap",
     "options": {
       "system": "Sistem",
       "light": "Terang",
@@ -988,5 +988,23 @@
     "learnMore": "Cara memperbaiki",
     "recorderBlocked": "Pintasan tidak dapat direkam saat ini — macOS Secure Input memblokir peristiwa tombol. Selesaikan peringatan Secure Input terlebih dahulu.",
     "dismiss": "Tutup"
+  },
+  "product": {
+    "name": "Local Dictation"
+  },
+  "localCleanup": {
+    "title": "Local cleanup",
+    "description": "Clean up dictation on this device. No account, API key, or cloud service. The optional Qwen3 model downloads once and then works offline.",
+    "runtimeMissing": "This build does not include the cleanup engine. Dictation still works.",
+    "ready": "Cleanup model is ready on this device.",
+    "needsModel": "Optional download: 1.83 GB. Keep at least 3 GB free.",
+    "download": "Download free cleanup model",
+    "downloading": "Downloading… {{progress}}%",
+    "enable": "Clean up my dictation automatically",
+    "fallback": "If cleanup is unavailable, too slow, or changes too much, your original transcript is inserted. Review important names and numbers.",
+    "shortcut": "Shortcut for dictation with cleanup",
+    "try": "Try cleanup without the microphone",
+    "input": "Enter some dictated text to try",
+    "preview": "Clean up text"
   }
 }

@@ -193,7 +193,7 @@ fn build_headers(provider: &PostProcessProvider, api_key: &str) -> Result<Header
         USER_AGENT,
         HeaderValue::from_static("Handy/1.0 (+https://github.com/cjpais/Handy)"),
     );
-    headers.insert("X-Title", HeaderValue::from_static("Handy"));
+    headers.insert("X-Title", HeaderValue::from_static("LocalDictation"));
 
     // Provider-specific auth headers
     if !api_key.is_empty() {
@@ -252,10 +252,8 @@ fn shared_client() -> Result<&'static reqwest::Client, String> {
 
 /// Create an HTTP client with provider-specific headers
 fn create_client(provider: &PostProcessProvider, api_key: &str) -> Result<ProviderClient, String> {
-    Ok(ProviderClient {
-        client: shared_client()?,
-        headers: build_headers(provider, api_key)?,
-    })
+    let _ = (provider, api_key);
+    Err("Cloud inference is disabled in Local Dictation".to_string())
 }
 
 /// Format a bounded error source chain.

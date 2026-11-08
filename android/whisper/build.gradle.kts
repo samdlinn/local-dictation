@@ -1,0 +1,76 @@
+plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+}
+
+android {
+    namespace = "dev.pivisolutions.dictus.whisper"
+    compileSdk = 36
+
+    defaultConfig {
+        minSdk = 29
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    // Force Release build for native libs even in debug APK.
+    // whisper.cpp without -O3 is ~70x slower (34s vs <1s for tiny model).
+    // ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES makes the NDK r27 toolchain link every 64-bit
+    // library (whisper and the ggml libs it pulls in) with 16 KB LOAD segments, which
+    // Android 15+ devices with 16 KB pages and Google Play require (#218). NDK r28+ does
+    // this by default.
+    defaultConfig {
+        externalNativeBuild {
+            cmake {
+                arguments("-DCMAKE_BUILD_TYPE=Release", "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON")
+            }
+        }
+    }
+
+    // Opt-in x86_64 for debug builds only, to transcribe on an x86_64 emulator:
+    //   ./gradlew assembleDebug -Pdictus.emulatorAbi=true
+    // Off by default so phone and CI debug builds do not compile whisper.cpp a third
+    // time. AGP merges buildType ndk.abiFilters with defaultConfig's; release always
+    // keeps the two ARM ABIs it ships.
+    buildTypes {
+        debug {
+            if (providers.gradleProperty("dictus.emulatorAbi").orNull.toBoolean()) {
+                ndk {
+                    abiFilters += "x86_64"
+                }
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/jni/whisper/CMakeLists.txt")
+            version = libs.versions.cmake.get()
+        }
+    }
+
+    ndkVersion = libs.versions.ndk.get()
+}
+
+dependencies {
+    implementation(project(":core"))
+    implementation(libs.timber)
+    implementation(libs.coroutines.android)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.coroutines.test)
+
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation("androidx.test:runner:1.6.2")
+}

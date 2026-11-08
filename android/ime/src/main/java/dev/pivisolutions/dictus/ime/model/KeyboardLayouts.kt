@@ -1,0 +1,159 @@
+package dev.pivisolutions.dictus.ime.model
+
+/**
+ * Complete keyboard layout data for all layers, ported from the iOS Dictus app.
+ *
+ * Each layout is a List<List<KeyDefinition>> representing rows of keys.
+ * Row 1-2: character keys. Row 3: shift + characters + delete. Row 4: utility keys.
+ *
+ * The AZERTY layout is the default for French users (fr_FR locale).
+ * The QWERTY layout is used for English and Spanish, QWERTZ for German. These are defaults:
+ * each keyboard language can be given any of the three (`KeyboardLayoutPreference`, #134).
+ * Numbers and symbols layers are shared across all layouts.
+ */
+object KeyboardLayouts {
+
+    val azertyLetters: List<List<KeyDefinition>> = listOf(
+        listOf("A", "Z", "E", "R", "T", "Y", "U", "I", "O", "P")
+            .map { KeyDefinition(label = it, output = it.lowercase()) },
+        listOf("Q", "S", "D", "F", "G", "H", "J", "K", "L", "M")
+            .map { KeyDefinition(label = it, output = it.lowercase()) },
+        listOf(
+            KeyDefinition("\u21E7", type = KeyType.SHIFT, widthMultiplier = 1.5f),
+            KeyDefinition("W", output = "w"),
+            KeyDefinition("X", output = "x"),
+            KeyDefinition("C", output = "c"),
+            KeyDefinition("V", output = "v"),
+            KeyDefinition("B", output = "b"),
+            KeyDefinition("N", output = "n"),
+            KeyDefinition("'", type = KeyType.ACCENT_ADAPTIVE),
+            KeyDefinition("\u232B", type = KeyType.DELETE, widthMultiplier = 1.5f),
+        ),
+        bottomRow(layerSwitchLabel = "123"),
+    )
+
+    /**
+     * QWERTY, as iOS draws it (`qwertyNormal` / `qwertyShifted`): row 2 has a 0.5 spacer at each
+     * end, so it totals 10 units and its nine keys sit under the gaps of row 1.
+     */
+    val qwertyLetters: List<List<KeyDefinition>> = listOf(
+        listOf("Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P")
+            .map { KeyDefinition(label = it, output = it.lowercase()) },
+        listOf(spacer(0.5f)) +
+            listOf("A", "S", "D", "F", "G", "H", "J", "K", "L")
+                .map { KeyDefinition(label = it, output = it.lowercase()) } +
+            spacer(0.5f),
+        listOf(
+            KeyDefinition("\u21E7", type = KeyType.SHIFT, widthMultiplier = 1.5f),
+            KeyDefinition("Z", output = "z"),
+            KeyDefinition("X", output = "x"),
+            KeyDefinition("C", output = "c"),
+            KeyDefinition("V", output = "v"),
+            KeyDefinition("B", output = "b"),
+            KeyDefinition("N", output = "n"),
+            KeyDefinition("M", output = "m"),
+            KeyDefinition("\u232B", type = KeyType.DELETE, widthMultiplier = 1.5f),
+        ),
+        bottomRow(layerSwitchLabel = "123"),
+    )
+
+    /**
+     * QWERTZ, the German default, as iOS draws it (`QWERTZLayout`): ü closes the top row, ö and
+     * ä the home row, so those two rows carry 11 keys and render slightly narrower ones. There
+     * is no ß key: it stays a long press on S. The bottom row is the same as QWERTY's.
+     */
+    val qwertzLetters: List<List<KeyDefinition>> = listOf(
+        listOf("Q", "W", "E", "R", "T", "Z", "U", "I", "O", "P", "\u00DC")
+            .map { KeyDefinition(label = it, output = it.lowercase()) },
+        listOf("A", "S", "D", "F", "G", "H", "J", "K", "L", "\u00D6", "\u00C4")
+            .map { KeyDefinition(label = it, output = it.lowercase()) },
+        listOf(
+            KeyDefinition("\u21E7", type = KeyType.SHIFT, widthMultiplier = 1.5f),
+            KeyDefinition("Y", output = "y"),
+            KeyDefinition("X", output = "x"),
+            KeyDefinition("C", output = "c"),
+            KeyDefinition("V", output = "v"),
+            KeyDefinition("B", output = "b"),
+            KeyDefinition("N", output = "n"),
+            KeyDefinition("M", output = "m"),
+            KeyDefinition("\u232B", type = KeyType.DELETE, widthMultiplier = 1.5f),
+        ),
+        qwertyLetters[3],
+    )
+
+    val numbersRows: List<List<KeyDefinition>> = listOf(
+        listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0")
+            .map { KeyDefinition(label = it, output = it) },
+        listOf("-", "/", ":", ";", "(", ")", "\u20AC", "&", "@", "\"")
+            .map { KeyDefinition(label = it, output = it) },
+        punctuationRow(pageToggleLabel = "#+="),
+        bottomRow(layerSwitchLabel = "ABC"),
+    )
+
+    val symbolsRows: List<List<KeyDefinition>> = listOf(
+        listOf("[", "]", "{", "}", "#", "%", "^", "*", "+", "=")
+            .map { KeyDefinition(label = it, output = it) },
+        listOf("_", "\\", "|", "~", "<", ">", "$", "\u00A3", "\u00A5", "\u00B7")
+            .map { KeyDefinition(label = it, output = it) },
+        punctuationRow(pageToggleLabel = "123"),
+        bottomRow(layerSwitchLabel = "ABC"),
+    )
+
+    /**
+     * Row 3 of the numbers and symbols pages, as iOS draws it (`numbersPage` / `symbolsPage`):
+     * the page toggle and delete keep 1.5, the five punctuation keys are 1.2 wide with a 0.5
+     * spacer at each end, so the row totals 10 units and the keys sit closer together.
+     */
+    private fun punctuationRow(pageToggleLabel: String): List<KeyDefinition> = listOf(
+        KeyDefinition(pageToggleLabel, type = KeyType.LAYER_SWITCH, widthMultiplier = 1.5f),
+        spacer(0.5f),
+        KeyDefinition(".", output = ".", widthMultiplier = 1.2f),
+        KeyDefinition(",", output = ",", widthMultiplier = 1.2f),
+        KeyDefinition("?", output = "?", widthMultiplier = 1.2f),
+        KeyDefinition("!", output = "!", widthMultiplier = 1.2f),
+        KeyDefinition("'", output = "'", widthMultiplier = 1.2f),
+        spacer(0.5f),
+        KeyDefinition("\u232B", type = KeyType.DELETE, widthMultiplier = 1.5f),
+    )
+
+    /**
+     * Row 4 of every page, as iOS draws it without the globe key (`bottomRow`): 123/ABC 1.25,
+     * emoji 1.25, space 5.5, return 2.0, so the row totals 10 units and is the same on the
+     * letters and symbols pages; only the page switch label changes.
+     */
+    private fun bottomRow(layerSwitchLabel: String): List<KeyDefinition> = listOf(
+        KeyDefinition(layerSwitchLabel, type = KeyType.LAYER_SWITCH, widthMultiplier = 1.25f),
+        KeyDefinition("\uD83D\uDE0A", type = KeyType.EMOJI, widthMultiplier = 1.25f),
+        KeyDefinition("space", output = " ", type = KeyType.SPACE, widthMultiplier = 5.5f),
+        KeyDefinition("\u21B5", type = KeyType.RETURN, widthMultiplier = 2.0f),
+    )
+
+    private fun spacer(widthMultiplier: Float) =
+        KeyDefinition(label = "", output = "", type = KeyType.SPACER, widthMultiplier = widthMultiplier)
+
+    /**
+     * Returns the letter layout for the given layout name.
+     * Defaults to AZERTY if the layout name is not recognized.
+     */
+    fun lettersForLayout(layout: String): List<List<KeyDefinition>> = when (layout) {
+        "azerty" -> azertyLetters
+        "qwerty" -> qwertyLetters
+        "qwertz" -> qwertzLetters
+        else -> azertyLetters
+    }
+
+    /** Applies profile-owned labels without mutating shared layout definitions. */
+    fun localizeUtilityLabels(
+        rows: List<List<KeyDefinition>>,
+        spaceLabel: String,
+        returnLabel: String,
+    ): List<List<KeyDefinition>> = rows.map { row ->
+        row.map { key ->
+            when (key.type) {
+                KeyType.SPACE -> key.copy(label = spaceLabel)
+                KeyType.RETURN -> key.copy(label = returnLabel)
+                else -> key
+            }
+        }
+    }
+}

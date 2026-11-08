@@ -15,6 +15,7 @@ mod input;
 mod language_detection;
 mod languages;
 mod llm_client;
+mod local_cleanup;
 mod managers;
 mod memory;
 mod notices;
@@ -692,6 +693,9 @@ pub fn run(cli_args: CliArgs) {
             shortcut::change_theme_setting,
             shortcut::change_start_hidden_setting,
             shortcut::change_autostart_setting,
+            local_cleanup::preview_local_cleanup,
+            local_cleanup::local_cleanup_status,
+            local_cleanup::download_cleanup_model,
             shortcut::change_translate_to_english_setting,
             shortcut::change_selected_language_setting,
             shortcut::change_spoken_languages_setting,
@@ -998,7 +1002,7 @@ pub fn run(cli_args: CliArgs) {
             // for portable mode (redirects WebView2 cache to portable Data dir)
             let mut win_builder =
                 tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("/".into()))
-                    .title("Handy")
+                    .title("LocalDictation")
                     .inner_size(utils::MAIN_WINDOW_SIZE.0, utils::MAIN_WINDOW_SIZE.1)
                     .min_inner_size(utils::MAIN_WINDOW_SIZE.0, utils::MAIN_WINDOW_SIZE.1)
                     .resizable(true)

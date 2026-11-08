@@ -1,0 +1,521 @@
+package dev.pivisolutions.dictus.ui.models
+
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.ui.semantics.Role
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import dev.pivisolutions.dictus.R
+import dev.pivisolutions.dictus.core.theme.DictusColors
+import dev.pivisolutions.dictus.core.theme.LocalDictusColors
+import androidx.compose.material3.MaterialTheme
+import dev.pivisolutions.dictus.model.AiProvider
+import dev.pivisolutions.dictus.model.ModelInfo
+import dev.pivisolutions.dictus.service.ModelInstallState
+import kotlin.math.roundToInt
+
+/**
+ * Reusable model card for ModelsScreen and the onboarding model download step.
+ *
+ * Displays model info (name, provider badge, description, precision/speed bars) and
+ * adapts to the download state:
+ * - Not downloaded: shows "Télécharger" accent button
+ * - Installing: nothing more, the full-screen preparation screen covers the tab (#181)
+ * - Downloaded: swipe left to reveal red delete button (iOS-style)
+ *
+ * WHY swipe-to-delete: Matches iOS Dictus behavior — cards stay compact without a
+ * visible delete button, and the swipe gesture is familiar to both iOS and Android users.
+ *
+ * WHY side-by-side description + bars layout: Matches iOS model card segmented style
+ * per CONTEXT.md locked decision. Description on left, precision/vitesse bars on right.
+ *
+ * WHY "WK" provider badge: Identifies the WhisperKit/whisper.cpp backend, matching
+ * iOS visual design for model provenance.
+ *
+ * @param model          ModelInfo descriptor from the catalog.
+ * @param isDownloaded   True if the model file exists on disk with correct size.
+ * @param isActive       True if this is the currently selected model.
+ * @param canDelete      True if this model can be deleted (not the last one).
+ * @param installState   State of this model's background install: error + Retry when the
+ *                       last one failed. Its progress is the preparation screen's (#181).
+ * @param onDownload     Callback to start downloading this model.
+ * @param onDelete       Callback to request deletion (shows confirmation sheet).
+ * @param onRetry        Callback to retry after a download failure.
+ * @param onSelect       Callback when a downloaded, non-active card is tapped to select it.
+ * @param requiredRamGb  Non-null when the device lacks the RAM for this model: the card is
+ *                       greyed out, cannot be downloaded or selected, and shows the reason.
+ * @param isRecommended  True for the model onboarding recommends: shows the "Recommandé" badge.
+ * @param onShowLanguages Callback to open the supported-languages sheet; null keeps the
+ *                       language summary as plain text.
+ */
+@Composable
+fun ModelCard(
+    model: ModelInfo,
+    isDownloaded: Boolean,
+    isActive: Boolean,
+    canDelete: Boolean,
+    installState: ModelInstallState = ModelInstallState.Idle,
+    onDownload: () -> Unit,
+    onDelete: () -> Unit,
+    onRetry: () -> Unit,
+    onSelect: () -> Unit = {},
+    requiredRamGb: Int? = null,
+    isRecommended: Boolean = false,
+    onShowLanguages: (() -> Unit)? = null,
+) {
+    // Issue #121: recess an unavailable card rather than hiding it (same 0.55 as iOS #369)
+    val isUnavailable = requiredRamGb != null
+
+    // Press animation state
+    var isPressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.96f else 1f,
+        animationSpec = spring(
+            dampingRatio = 0.6f,
+            stiffness = Spring.StiffnessMedium,
+        ),
+        label = "card_scale",
+    )
+
+    // Active cards get an accent border; others get the default glass border
+    val borderColor = if (isActive) DictusColors.Accent else DictusColors.GlassBorder
+
+    // Swipe-to-delete state
+    val deleteButtonWidth = 80.dp
+    val density = LocalDensity.current
+    val deleteButtonWidthPx = with(density) { deleteButtonWidth.toPx() }
+    var offsetX by remember { mutableFloatStateOf(0f) }
+    val animatedOffsetX by animateFloatAsState(
+        targetValue = offsetX,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow,
+        ),
+        label = "swipe_offset",
+    )
+
+    // Card height for the delete button
+    var cardHeightPx by remember { mutableFloatStateOf(0f) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .scale(scale)
+            .clip(RoundedCornerShape(16.dp)),
+    ) {
+        // Red delete button behind the card (revealed on swipe left)
+        if (isDownloaded && canDelete && animatedOffsetX < -1f) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .width(deleteButtonWidth)
+                    .height(with(density) { cardHeightPx.toDp() })
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(DictusColors.Destructive)
+                    .pointerInput(Unit) {
+                        detectTapGestures(onTap = {
+                            onDelete()
+                            offsetX = 0f
+                        })
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.model_delete_cd),
+                    tint = Color.White,
+                    modifier = Modifier.padding(8.dp),
+                )
+            }
+        }
+
+        // Main card content (slides left on swipe)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .offset { IntOffset(animatedOffsetX.roundToInt(), 0) }
+                .alpha(if (isUnavailable) 0.55f else 1f)
+                .onSizeChanged { cardHeightPx = it.height.toFloat() }
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .border(
+                    if (isActive) 2.dp else 1.dp,
+                    borderColor,
+                    RoundedCornerShape(16.dp),
+                )
+                .pointerInput(isDownloaded, isActive, canDelete) {
+                    if (isDownloaded && canDelete) {
+                        detectHorizontalDragGestures(
+                            onDragEnd = {
+                                // Snap: if dragged past half the button width, reveal fully
+                                offsetX = if (offsetX < -deleteButtonWidthPx / 2) {
+                                    -deleteButtonWidthPx
+                                } else {
+                                    0f
+                                }
+                            },
+                            onHorizontalDrag = { _, dragAmount ->
+                                offsetX = (offsetX + dragAmount)
+                                    .coerceIn(-deleteButtonWidthPx, 0f)
+                            },
+                        )
+                    }
+                }
+                .pointerInput(isDownloaded, isActive, isUnavailable) {
+                    detectTapGestures(
+                        onPress = {
+                            isPressed = true
+                            tryAwaitRelease()
+                            isPressed = false
+                        },
+                        onTap = {
+                            // Reset swipe if open
+                            if (offsetX < 0f) {
+                                offsetX = 0f
+                            } else if (isDownloaded && !isActive && !isUnavailable) {
+                                onSelect()
+                            }
+                        },
+                    )
+                }
+                .padding(20.dp),
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                // Model header row: name + "WK" provider badge + active chip
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        // Model name with inline "WK" provider badge
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            Text(
+                                text = model.displayName,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                            // Provider badge — "WK" (blue) for Whisper, "NV" (amber) for Parakeet/Nvidia
+                            val (badgeText, badgeColor) = when (model.provider) {
+                                AiProvider.WHISPER -> "WK" to DictusColors.Accent
+                                AiProvider.PARAKEET -> "NV" to Color(0xFFF59E0B)
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(badgeColor.copy(alpha = 0.2f))
+                                    .padding(horizontal = 6.dp, vertical = 2.dp),
+                            ) {
+                                Text(
+                                    text = badgeText,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = badgeColor,
+                                )
+                            }
+                            // Same pill as iOS ModelCardView: accent text on 15% accent
+                            if (isRecommended) {
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(4.dp))
+                                        .background(DictusColors.Accent.copy(alpha = 0.15f))
+                                        .padding(horizontal = 6.dp, vertical = 2.dp),
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.model_recommended),
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = DictusColors.Accent,
+                                    )
+                                }
+                            }
+                        }
+                        if (isActive) {
+                            // Active chip
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color(0x206BA3FF))
+                                    .padding(horizontal = 8.dp, vertical = 2.dp),
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.model_active),
+                                    color = DictusColors.AccentHighlight,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium,
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Language summary (issue #133): tapping it opens the full list.
+                // English-only stays amber, as the former warning was.
+                LanguageSummaryRow(model = model, onClick = onShowLanguages)
+
+                // Description below name (matches iOS vertical layout)
+                Text(
+                    text = stringResource(model.descriptionRes),
+                    color = LocalDictusColors.current.textSecondary,
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp,
+                )
+
+                // Why the card is greyed out: names the phone's limit, not an app error
+                if (requiredRamGb != null) {
+                    Text(
+                        text = stringResource(R.string.model_requires_ram, requiredRamGb),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+
+                // Precision and Vitesse side by side on the same row (matches iOS)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    SegmentedMetricBar(
+                        label = stringResource(R.string.model_precision),
+                        value = model.precision,
+                        segmentTestTag = "model_precision_segment",
+                        color = DictusColors.Accent,
+                        modifier = Modifier.weight(1f),
+                    )
+                    SegmentedMetricBar(
+                        label = stringResource(R.string.model_speed),
+                        value = model.speed,
+                        segmentTestTag = "model_speed_segment",
+                        color = DictusColors.AccentHighlight,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+
+                // Size label
+                val sizeMb = model.expectedSizeBytes / 1_000_000
+                Text(
+                    text = "~$sizeMb Mo",
+                    color = LocalDictusColors.current.textSecondary,
+                    fontSize = 12.sp,
+                )
+
+                // Download progress or action buttons
+                when {
+                    installState.isInProgress -> {
+                        // The preparation screen shows the progress (#181)
+                    }
+                    installState is ModelInstallState.Failed -> {
+                        // Error state with retry
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.model_download_error),
+                                color = DictusColors.Destructive,
+                                fontSize = 13.sp,
+                            )
+                            TextButton(onClick = onRetry) {
+                                Text(
+                                    text = stringResource(R.string.model_retry),
+                                    color = DictusColors.Destructive,
+                                    fontSize = 13.sp,
+                                )
+                            }
+                        }
+                    }
+                    isUnavailable -> {
+                        // No download button: the device cannot run this model
+                    }
+                    isDownloaded -> {
+                        // No delete button — swipe left to reveal delete action
+                    }
+                    else -> {
+                        // Download button (accent gradient)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(40.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(
+                                    brush = Brush.horizontalGradient(
+                                        colors = listOf(
+                                            DictusColors.Accent,
+                                            DictusColors.AccentDark,
+                                        ),
+                                    )
+                                )
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onTap = { onDownload() })
+                                },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.model_download),
+                                color = Color.White,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Globe + coverage summary ("~99 languages") + info glyph, one tap target.
+ *
+ * WHY a clickable row inside the card and not the whole card: tapping the card already
+ * selects the model, so the languages need their own target (the iOS card has an
+ * info button for the same reason). Its click consumes the tap, so the card does not
+ * also select the model. Role and click label tell TalkBack what the tap does.
+ */
+@Composable
+private fun LanguageSummaryRow(model: ModelInfo, onClick: (() -> Unit)?) {
+    val color = if (model.isEnglishOnly) Color(0xFFF59E0B) else LocalDictusColors.current.textSecondary
+    val clickLabel = stringResource(R.string.model_languages_show)
+    Row(
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .then(
+                if (onClick != null) {
+                    Modifier.clickable(onClickLabel = clickLabel, role = Role.Button, onClick = onClick)
+                } else {
+                    Modifier
+                },
+            )
+            .background(color.copy(alpha = 0.12f))
+            .heightIn(min = 36.dp)
+            .padding(horizontal = 10.dp, vertical = 6.dp)
+            .testTag("model_languages_summary"),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Default.Language,
+            contentDescription = null,
+            tint = color,
+            modifier = Modifier.size(16.dp),
+        )
+        Text(
+            text = languageSummary(model.languages),
+            color = color,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Medium,
+        )
+        if (onClick != null) {
+            Icon(
+                imageVector = Icons.Outlined.Info,
+                contentDescription = null,
+                tint = color,
+                modifier = Modifier.size(16.dp),
+            )
+        }
+    }
+}
+
+/**
+ * iOS-style segmented metric bar with 5 sub-bars.
+ *
+ * Matches iOS BrandWaveform model card design: each metric shows a label
+ * above a row of 5 rounded segments. Filled segments use accent blue,
+ * empty segments use a muted background color.
+ *
+ * @param label Label shown above the segments (e.g. "Précision").
+ * @param value Progress value from 0.0 to 1.0 (mapped to 0–5 filled segments).
+ * @param modifier Modifier for the outer Column.
+ */
+@Composable
+private fun SegmentedMetricBar(
+    label: String,
+    value: Float,
+    segmentTestTag: String,
+    color: Color = DictusColors.Accent,
+    modifier: Modifier = Modifier,
+) {
+    val segmentCount = 5
+    // Map 0.0–1.0 to 0–5 filled segments (round to nearest)
+    val filledCount = (value.coerceIn(0f, 1f) * segmentCount).roundToInt()
+    val filledColor = color
+    // iOS uses color.opacity(0.15) for empty segments — same hue, very faded
+    val emptyColor = color.copy(alpha = 0.15f)
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Text(
+            text = label,
+            color = LocalDictusColors.current.textSecondary,
+            fontSize = 12.sp,
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(3.dp),
+        ) {
+            for (i in 0 until segmentCount) {
+                Box(
+                    modifier = Modifier
+                        .testTag(segmentTestTag)
+                        .weight(1f)
+                        .height(6.dp)
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(if (i < filledCount) filledColor else emptyColor),
+                )
+            }
+        }
+    }
+}

@@ -45,3 +45,14 @@ result
 
 # Python bytecode (scripts/)
 __pycache__/
+
+.build/
+android/.cache/
+src-tauri/resources/bin/*
+!src-tauri/resources/bin/.gitkeep
+*.gguf
+*.bin
+*.dmg
+*.apk
+*.exe
+*.msi

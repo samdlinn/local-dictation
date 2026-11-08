@@ -1,6 +1,6 @@
 [package]
 name = "handy"
-version = "0.10.0"
+version = "0.1.0"
 description = "Handy"
 authors = ["cjpais"]
 edition = "2021"
@@ -51,7 +51,7 @@ anyhow = "1.0.95"
 hound = "3.5.1"
 log = "0.4.25"
 env_filter = "0.1.0"
-tokio = { version = "1.43.0", features = ["process"] }
+tokio = { version = "1.43.0", features = ["process", "time"] }
 earshot = "1.2.2"
 enigo = "0.6.1"
 # Feedback sounds. No `recording`: microphone capture is handy-recorder's.
@@ -137,10 +137,7 @@ winreg = "0.55"
 # signtool verify entirely. CI pins -DGGML_NATIVE=OFF (see build.yml) so the
 # static build targets a portable ARM baseline, not the build runner's CPU.
 [target.'cfg(all(windows, target_arch = "x86_64"))'.dependencies]
-transcribe-cpp = { version = "0.4.0", default-features = false, features = [
-  "dynamic-backends",
-  "vulkan",
-] }
+transcribe-cpp = { version = "0.4.0", default-features = false, features = [] }
 
 [target.'cfg(all(windows, target_arch = "aarch64"))'.dependencies]
 transcribe-cpp = { version = "0.4.0", default-features = false }
@@ -172,10 +169,7 @@ gtk-layer-shell = { version = "0.8", features = ["v0_6"] }
 # version against the release that introduced damage-based compositing.
 webkit2gtk-sys = "2.0"
 gtk = "0.18"
-transcribe-cpp = { version = "0.4.0", default-features = false, features = [
-  "dynamic-backends",
-  "vulkan",
-] }
+transcribe-cpp = { version = "0.4.0", default-features = false, features = [] }
 
 # TEMPORARY: tao pinned past 0.35.3 for the Wayland client-side-decorations fix
 # (tao #1218, fixes tauri #11856 — dead titlebar buttons after visible(false) →

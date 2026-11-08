@@ -439,9 +439,20 @@ pub(crate) async fn process_transcription_output(
     let mut post_process_prompt: Option<String> = None;
     let mut post_process_failed = false;
 
-    if post_process {
+    if post_process || settings.post_process_enabled {
         // A reply that's blank once cleaned is no better than none.
-        let outcome = match post_process_transcription(&settings, &final_text).await {
+        let local_outcome = if is_blank_transcription(&final_text) {
+            PostProcessOutcome::Skipped
+        } else {
+            match crate::local_cleanup::clean(app, &final_text).await {
+                Ok(text) => PostProcessOutcome::Done(text),
+                Err(error) => {
+                    log::warn!("Local cleanup unavailable: {error}");
+                    PostProcessOutcome::Failed
+                }
+            }
+        };
+        let outcome = match local_outcome {
             PostProcessOutcome::Done(text) => non_blank_post_processed_text(text)
                 .map_or(PostProcessOutcome::Failed, PostProcessOutcome::Done),
             outcome => outcome,

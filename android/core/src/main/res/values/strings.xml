@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Local Dictation</string>
+    <string name="ime_name">Local Dictation</string>
+    <string name="enable_ime_instructions">Enable Local Dictation Keyboard in Settings &gt; System &gt; Languages &amp; Input &gt; On-screen keyboard</string>
+    <string name="model_loading_title">Preparing speech recognition</string>
+    <string name="model_loading_body">This stays on your device and may take a moment.</string>
+    <string name="model_loading_failed_title">Speech recognition could not start</string>
+    <string name="model_loading_failed_body">Try loading the model again, or cancel to return.</string>
+    <string name="model_loading_retry">Retry</string>
+    <string name="model_loading_cancel">Cancel</string>
+    <string name="model_loading_accessibility">Speech recognition model is loading. Microphone unavailable.</string>
+    <string name="model_loading_failed_accessibility">Speech recognition model failed to load.</string>
+    <string name="model_missing_title">No voice model yet</string>
+    <string name="model_missing_body">Download a voice model to start dictating.</string>
+    <string name="model_missing_accessibility">No speech recognition model is downloaded. Microphone unavailable.</string>
+    <!-- A dictation that produced no text. A notice, not an error; same sentence as iOS (#153, iOS #313). -->
+    <string name="dictation_no_words_detected">No words detected</string>
+    <!-- A dictation that failed (missing model, engine failure, timeout). Names no cause; iOS unexplainedFailure (#182). -->
+    <string name="dictation_failed">The dictation failed. Tap the microphone to try again.</string>
+</resources>

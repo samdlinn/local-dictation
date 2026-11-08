@@ -1,22 +1,23 @@
 name: Build apps
 on:
   workflow_dispatch:
+    inputs:
+      target:
+        type: choice
+        description: Platform to build
+        default: all
+        options: [all, macos, windows, linux, android]
   push:
     tags: ["v*"]
 permissions:
   contents: read
 jobs:
   desktop:
+    if: inputs.target != 'android'
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: macos-latest
-            bundles: app,dmg
-          - os: windows-latest
-            bundles: nsis
-          - os: ubuntu-24.04
-            bundles: deb,appimage
+        include: ${{ fromJSON(inputs.target == 'windows' && '[{"os":"windows-latest","bundles":"nsis"}]' || inputs.target == 'macos' && '[{"os":"macos-latest","bundles":"app,dmg"}]' || inputs.target == 'linux' && '[{"os":"ubuntu-24.04","bundles":"deb,appimage"}]' || '[{"os":"macos-latest","bundles":"app,dmg"},{"os":"windows-latest","bundles":"nsis"},{"os":"ubuntu-24.04","bundles":"deb,appimage"}]') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 55
     steps:
@@ -58,6 +59,7 @@ jobs:
             src-tauri/target/release/bundle/deb/*.deb
             src-tauri/target/release/bundle/appimage/*.AppImage
   android:
+    if: github.event_name != 'workflow_dispatch' || inputs.target == 'all' || inputs.target == 'android'
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     env:

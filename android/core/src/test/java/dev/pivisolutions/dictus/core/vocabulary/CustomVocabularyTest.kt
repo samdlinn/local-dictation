@@ -1,7 +1,6 @@
 package dev.pivisolutions.dictus.core.vocabulary
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import dev.pivisolutions.dictus.core.premium.PremiumFlags
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -56,14 +55,15 @@ class CustomVocabularyTest {
     }
 
     @Test
-    fun `the vocabulary is hidden by default`() {
-        assertFalse(PremiumFlags.VOCABULARY)
+    fun `stored vocabulary works without an entitlement`() = runTest {
+        storeKubernetes()
+        assertEquals("on passe sur Kubernetes demain", CustomVocabulary(store).corrected(raw))
     }
 
     @Test
     fun `with the flag off the text is unchanged even with entries stored`() = runTest {
         storeKubernetes()
-        assertEquals(raw, CustomVocabulary(store).corrected(raw))
+        assertEquals(raw, CustomVocabulary(store, isEnabled = { false }).corrected(raw))
         assertEquals(listOf("vocabularyApplied: enabled=no entries=0 replacements=0 chars=${raw.length}"), logs)
     }
 

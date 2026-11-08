@@ -4,6 +4,8 @@ Free dictation with local speech recognition and optional on-device AI cleanup. 
 
 **Early alpha.** This is an independent project built on Handy and Dictus, with original branding and credit retained. It is not affiliated with Wispr Flow or the upstream projects. iPhone support is deferred while free installation is evaluated.
 
+GitHub lists contributors from Handy’s inherited commit history. Those credits identify historical authors of the foundation, not a newly assembled Local Dictation team.
+
 ## Install an app
 
 Download a package from [Releases](https://github.com/samdlinn/local-dictation/releases). You do not need to build from source.

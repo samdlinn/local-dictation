@@ -32,6 +32,13 @@ class DictusApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        // The native worker must not open or mutate the main process's DataStore.
+        if (getProcessName()?.endsWith(":cleanup") == true) return
+        // Remove first-alpha raw diagnostics even if no new dictation is made.
+        val legacyDiagnostics = java.io.File(filesDir, dev.pivisolutions.dictus.debug.TranscriptionDebugStore.LEGACY_FILE_NAME)
+        if (legacyDiagnostics.exists()) check(legacyDiagnostics.delete()) { "Could not remove legacy diagnostic data" }
+        cacheDir.listFiles()?.filter { it.isFile && Regex("dictus-polish-debug-[0-9]{8}-[0-9]{6}\\.json").matches(it.name) }
+            ?.forEach { check(it.delete()) { "Could not remove legacy diagnostic export" } }
         TimberSetup.init(BuildConfig.DEBUG, filesDir)
         // One banner per process (#112): the IME runs in this process too, so a keyboard-only
         // session gets it as well, and a log read in isolation still names its build.

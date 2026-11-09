@@ -40,6 +40,9 @@ pub async fn get_audio_file_path(
     history_manager: State<'_, Arc<HistoryManager>>,
     file_name: String,
 ) -> Result<String, String> {
+    if std::path::Path::new(&file_name).file_name() != Some(std::ffi::OsStr::new(&file_name)) {
+        return Err("Invalid recording filename".into());
+    }
     let path = history_manager.get_audio_file_path(&file_name);
     path.to_str()
         .ok_or_else(|| "Invalid file path".to_string())

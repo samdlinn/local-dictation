@@ -943,56 +943,32 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn anthropic_format_parses_messages_response() {
-        let base_url = serve_one_response(
-            "200 OK",
-            r#"{"type":"message","role":"assistant","content":[{"type":"text","text":"Cleaned text"}]}"#,
-        )
-        .await;
-        let result = send_chat_completion(
-            &anthropic_format_provider(&base_url),
-            "key".to_string(),
-            "claude-haiku",
-            "raw text".to_string(),
-            true,
-        )
-        .await;
-        assert_eq!(result, Ok(Some("Cleaned text".to_string())));
-    }
-
-    #[tokio::test]
-    async fn chat_completion_rejects_truncated_response() {
-        let base_url = serve_one_response(
-            "200 OK",
-            r#"{"choices":[{"message":{"content":"Cut off"},"finish_reason":"length"}]}"#,
-        )
-        .await;
-        let result = send_chat_completion(
-            &provider("custom", &base_url),
-            "key".to_string(),
-            "test-model",
-            "raw text".to_string(),
-            false,
-        )
-        .await;
-        assert!(result.unwrap_err().contains("truncated"));
-    }
-
-    #[tokio::test]
-    async fn anthropic_format_rejects_truncated_response() {
-        let base_url = serve_one_response(
-            "200 OK",
-            r#"{"type":"message","stop_reason":"max_tokens","content":[{"type":"text","text":"Cut off"}]}"#,
-        )
-        .await;
-        let result = send_chat_completion(
-            &anthropic_format_provider(&base_url),
-            "key".to_string(),
-            "claude-haiku",
-            "raw text".to_string(),
-            true,
-        )
-        .await;
-        assert!(result.unwrap_err().contains("truncated"));
+    async fn privacy_regression_cloud_clients_reject_requests_without_network_io() {
+        for anthropic in [false, true] {
+            let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+            let url = format!("http://{}", listener.local_addr().unwrap());
+            let configuration = if anthropic {
+                anthropic_format_provider(&url)
+            } else {
+                provider("custom", &url)
+            };
+            let result = send_chat_completion(
+                &configuration,
+                "synthetic-key".into(),
+                "test-model",
+                "synthetic dictation".into(),
+                anthropic,
+            )
+            .await;
+            assert_eq!(
+                result,
+                Err("Cloud inference is disabled in Local Dictation".to_string())
+            );
+            assert!(
+                tokio::time::timeout(std::time::Duration::from_millis(20), listener.accept())
+                    .await
+                    .is_err()
+            );
+        }
     }
 }

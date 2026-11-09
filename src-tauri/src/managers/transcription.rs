@@ -2357,7 +2357,7 @@ mod tests {
     fn fuzzy_correction_is_skipped_exactly_when_vocabulary_was_sent() {
         let settings = AppSettings {
             selected_language: "en".to_string(),
-            custom_words: vec!["LocalDictation".to_string()],
+            custom_words: vec!["Handy".to_string()],
             ..Default::default()
         };
         let evidence = OutputLanguageEvidence::UserSelected("en".to_string());

@@ -1,0 +1,42 @@
+{
+  "RUSTSEC-2025-0141": {
+    "name": "bincode",
+    "version": "2.0.1",
+    "reason": "Transitive serialization dependency; maintenance notice, not a published vulnerability. App-worker messages use JSON."
+  },
+  "RUSTSEC-2024-0422": {
+    "name": "gtk-layer-shell",
+    "version": "0.8.2",
+    "reason": "GTK3 Wayland integration; maintained GTK4 bindings are incompatible with Tauri's GTK3 backend."
+  },
+  "RUSTSEC-2024-0423": {
+    "name": "gtk-layer-shell-sys",
+    "version": "0.7.2",
+    "reason": "GTK3 Wayland FFI binding; same GUI-stack constraint as gtk-layer-shell."
+  },
+  "RUSTSEC-2024-0436": {
+    "name": "paste",
+    "version": "1.0.15",
+    "reason": "Transitive compile-time macro dependency; maintenance notice only."
+  },
+  "RUSTSEC-2024-0370": {
+    "name": "proc-macro-error",
+    "version": "1.0.4",
+    "reason": "Transitive GTK3 compile-time dependency; maintenance notice only."
+  },
+  "RUSTSEC-2026-0371": {
+    "name": "zbus_names",
+    "version": "4.3.5",
+    "reason": "Transitive Linux desktop IPC dependency; maintenance notice only."
+  },
+  "RUSTSEC-2026-0370": {
+    "name": "zvariant",
+    "version": "5.15.1",
+    "reason": "Transitive Linux desktop IPC serialization dependency; maintenance notice only."
+  },
+  "RUSTSEC-2026-0372": {
+    "name": "zvariant_derive",
+    "version": "5.15.1",
+    "reason": "Transitive Linux desktop IPC derive dependency; maintenance notice only."
+  }
+}

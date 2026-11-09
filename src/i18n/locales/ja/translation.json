@@ -321,7 +321,8 @@
     "modelUnloaded": "モデルがアンロードされました",
     "noModelDownloadRequired": "モデルなし - ダウンロードが必要",
     "downloadSpeed": "{{speed}} MB/s",
-    "lockedWhileTranscribing": "履歴の文字起こしが終わるとモデルを変更できます。"
+    "lockedWhileTranscribing": "履歴の文字起こしが終わるとモデルを変更できます。",
+    "downloadingGeneric": "Downloading…"
   },
   "settings": {
     "modelSettings": {
@@ -794,7 +795,8 @@
         "days3": "3日後",
         "weeks2": "2週間後",
         "months3": "3ヶ月後",
-        "placeholder": "保持期間を選択…"
+        "placeholder": "保持期間を選択…",
+        "historyOff": "History off (no saved dictations)"
       },
       "alwaysOnMicrophone": {
         "label": "マイク常時オン",

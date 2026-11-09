@@ -32,7 +32,6 @@ class TranscriptionDebugExporterTest {
     private val entry = TranscriptionDebugEntry(
         id = "6F9619FF-8B86-D011-B42D-00C04FC964FF",
         timestampMs = 1_792_999_990_000L,
-        raw = " Guten Tag",
         writer = "<KBD>",
         metrics = TranscriptionDebugMetrics(
             detectedLanguage = null,
@@ -68,7 +67,7 @@ class TranscriptionDebugExporterTest {
         assertEquals("de", event.getString("sttLanguageCode"))
         assertTrue(event.getBoolean("sttLanguageIsEffective"))
         assertEquals("skippedToggleOff", event.getString("outcome"))
-        assertEquals(" Guten Tag", event.getString("raw"))
+        assertTrue(event.isNull("raw"))
         assertTrue(event.isNull("polished"))
         assertEquals(790, event.getInt("engineMs"))
         assertEquals(1, export.getJSONObject("outcomes").getInt("skippedToggleOff"))

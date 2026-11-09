@@ -321,7 +321,8 @@
     "modelUnloaded": "Model frigjort",
     "noModelDownloadRequired": "Ingen model - download påkrævet",
     "downloadSpeed": "{{speed}} MB/s",
-    "lockedWhileTranscribing": "Du kan skifte model, når transskriberingen i Historik er færdig."
+    "lockedWhileTranscribing": "Du kan skifte model, når transskriberingen i Historik er færdig.",
+    "downloadingGeneric": "Downloading…"
   },
   "settings": {
     "modelSettings": {
@@ -794,7 +795,8 @@
         "days3": "Efter 3 dage",
         "weeks2": "Efter 2 uger",
         "months3": "Efter 3 måneder",
-        "placeholder": "Vælg opbevaringsperiode..."
+        "placeholder": "Vælg opbevaringsperiode...",
+        "historyOff": "History off (no saved dictations)"
       },
       "alwaysOnMicrophone": {
         "label": "Altid aktiv mikrofon",

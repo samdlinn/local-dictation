@@ -174,7 +174,6 @@ internal class DictationTranscriber(
     ) = TranscriptionDebugEntry(
         id = UUID.randomUUID().toString().uppercase(),
         timestampMs = now(),
-        raw = raw,
         writer = when (dictation.source) {
             DictationSource.KEYBOARD -> "<KBD>"
             DictationSource.APP -> "<APP>"

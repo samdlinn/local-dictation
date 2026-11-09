@@ -43,6 +43,11 @@ def main():
         with zipfile.ZipFile(signed) as archive, signed.open("rb") as stream:
             for entry in archive.infolist():
                 if entry.filename.startswith("lib/") and entry.filename.endswith(".so"):
+                    if entry.filename.endswith("/libai-chat.so"):
+                        binary = archive.read(entry)
+                        for forbidden in [b"Formatted and added %s message", b"User prompt received:", b"System prompt received:", b"cached: `%s`"]:
+                            if forbidden in binary:
+                                raise SystemExit("Sensitive native logging literal detected in APK.")
                     if entry.compress_type != zipfile.ZIP_STORED:
                         raise SystemExit("Native library was unexpectedly compressed.")
                     stream.seek(entry.header_offset + 26)

@@ -321,7 +321,8 @@
     "modelUnloaded": "Model ontladen",
     "noModelDownloadRequired": "Geen model - Download vereist",
     "downloadSpeed": "{{speed}} MB/s",
-    "lockedWhileTranscribing": "Je kunt van model wisselen zodra het transcriberen in Geschiedenis klaar is."
+    "lockedWhileTranscribing": "Je kunt van model wisselen zodra het transcriberen in Geschiedenis klaar is.",
+    "downloadingGeneric": "Downloading…"
   },
   "settings": {
     "modelSettings": {
@@ -794,7 +795,8 @@
         "days3": "Na 3 dagen",
         "weeks2": "Na 2 weken",
         "months3": "Na 3 maanden",
-        "placeholder": "Selecteer bewaarperiode..."
+        "placeholder": "Selecteer bewaarperiode...",
+        "historyOff": "History off (no saved dictations)"
       },
       "alwaysOnMicrophone": {
         "label": "Microfoon altijd aan",

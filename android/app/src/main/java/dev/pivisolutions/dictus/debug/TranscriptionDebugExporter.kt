@@ -107,7 +107,7 @@ object TranscriptionDebugExporter {
             // Only set when a custom-vocabulary pass rewrote `raw`, which Android does not run yet.
             .put("engineRawCharCount", JSONObject.NULL)
             .put("polishedCharCount", metrics.polishedCharCount)
-            .put("raw", entry.raw)
+            .put("raw", JSONObject.NULL)
             .put("vocabularyCorrected", JSONObject.NULL)
             .put("polished", JSONObject.NULL)
             .put("sttEngine", metrics.sttEngine ?: JSONObject.NULL)

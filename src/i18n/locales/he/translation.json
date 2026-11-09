@@ -321,7 +321,8 @@
     "modelUnloaded": "המודל נפרק",
     "noModelDownloadRequired": "אין מודל, נדרשת הורדה",
     "downloadSpeed": "{{speed}} MB/s",
-    "lockedWhileTranscribing": "אפשר יהיה להחליף מודל אחרי שהתמלול בהיסטוריה יסתיים."
+    "lockedWhileTranscribing": "אפשר יהיה להחליף מודל אחרי שהתמלול בהיסטוריה יסתיים.",
+    "downloadingGeneric": "Downloading…"
   },
   "settings": {
     "modelSettings": {
@@ -794,7 +795,8 @@
         "days3": "אחרי 3 ימים",
         "weeks2": "אחרי שבועיים",
         "months3": "אחרי 3 חודשים",
-        "placeholder": "בחר משך שמירה..."
+        "placeholder": "בחר משך שמירה...",
+        "historyOff": "History off (no saved dictations)"
       },
       "alwaysOnMicrophone": {
         "label": "מיקרופון תמיד פעיל",

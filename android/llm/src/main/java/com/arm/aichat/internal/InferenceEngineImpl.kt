@@ -5,7 +5,6 @@ import android.util.Log
 import com.arm.aichat.InferenceEngine
 import com.arm.aichat.UnsupportedArchitectureException
 import com.arm.aichat.internal.InferenceEngineImpl.Companion.getInstance
-import dalvik.annotation.optimization.FastNative
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +18,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
@@ -79,34 +77,24 @@ internal class InferenceEngineImpl private constructor(
      * JNI methods
      * @see ai_chat.cpp
      */
-    @FastNative
     private external fun init(nativeLibDir: String)
 
-    @FastNative
     private external fun load(modelPath: String): Int
 
-    @FastNative
     private external fun prepare(): Int
 
-    @FastNative
     private external fun systemInfo(): String
 
-    @FastNative
     private external fun benchModel(pp: Int, tg: Int, pl: Int, nr: Int): String
 
-    @FastNative
     private external fun processSystemPrompt(systemPrompt: String): Int
 
-    @FastNative
     private external fun processUserPrompt(userPrompt: String, predictLength: Int): Int
 
-    @FastNative
     private external fun generateNextToken(): String?
 
-    @FastNative
     private external fun unload()
 
-    @FastNative
     private external fun shutdown()
 
     private val _state =
@@ -137,9 +125,8 @@ internal class InferenceEngineImpl private constructor(
                 _state.value = InferenceEngine.State.Initialized
                 Log.i(TAG, "Native library loaded! System info: \n${systemInfo()}")
 
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to load native library", e)
-                throw e
+            } catch (_: Throwable) {
+                _state.value = InferenceEngine.State.Error(IOException("Native cleanup engine unavailable"))
             }
         }
     }
@@ -230,8 +217,7 @@ internal class InferenceEngineImpl private constructor(
 
             processUserPrompt(message, predictLength).let { result ->
                 if (result != 0) {
-                    Log.e(TAG, "Failed to process user prompt: $result")
-                    return@flow
+                    throw IOException("Could not process cleanup input")
                 }
             }
 
@@ -278,47 +264,21 @@ internal class InferenceEngineImpl private constructor(
     /**
      * Unloads the model and frees resources, or reset error states
      */
-    override fun cleanUp() {
+    override suspend fun cleanUp() = withContext(llamaDispatcher) {
         _cancelGeneration = true
-        runBlocking(llamaDispatcher) {
-            when (val state = _state.value) {
-                is InferenceEngine.State.ModelReady -> {
-                    Log.i(TAG, "Unloading model and free resources...")
-                    _readyForSystemPrompt = false
-                    _state.value = InferenceEngine.State.UnloadingModel
-
-                    unload()
-
-                    _state.value = InferenceEngine.State.Initialized
-                    Log.i(TAG, "Model unloaded!")
-                    Unit
-                }
-
-                is InferenceEngine.State.Error -> {
-                    Log.i(TAG, "Resetting error states...")
-                    _state.value = InferenceEngine.State.Initialized
-                    Log.i(TAG, "States reset!")
-                    Unit
-                }
-
-                else -> throw IllegalStateException("Cannot unload model in ${state.javaClass.simpleName}")
-            }
+        _readyForSystemPrompt = false
+        // Native unload is safe for partially allocated or already-freed resources.
+        if (_state.value !is InferenceEngine.State.Uninitialized &&
+            _state.value !is InferenceEngine.State.Initializing) {
+            _state.value = InferenceEngine.State.UnloadingModel
+            unload()
+            _state.value = InferenceEngine.State.Initialized
         }
     }
 
-    /**
-     * Cancel all ongoing coroutines and free GGML backends
-     */
-    override fun destroy() {
-        _cancelGeneration = true
-        runBlocking(llamaDispatcher) {
-            _readyForSystemPrompt = false
-            when(_state.value) {
-                is InferenceEngine.State.Uninitialized -> {}
-                is InferenceEngine.State.Initialized -> shutdown()
-                else -> { unload(); shutdown() }
-            }
-        }
+    override suspend fun destroy() {
+        cleanUp()
+        withContext(llamaDispatcher) { shutdown() }
         llamaScope.cancel()
     }
 }

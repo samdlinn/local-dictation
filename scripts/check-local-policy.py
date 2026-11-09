@@ -16,3 +16,15 @@ assert 'pub fn update_checks_forced_disabled() -> bool {\n    true' in settings
 assert 'local_cleanup::clean(app, &final_text).await' in (root/'src-tauri/src/actions.rs').read_text(encoding="utf-8")
 assert '.plugin(tauri_plugin_updater::Builder' not in (root/'src-tauri/src/lib.rs').read_text(encoding="utf-8")
 print('Local processing and privacy defaults verified.')
+
+assert config['app']['security']['csp']
+assert config['app']['security']['assetProtocol']['scope']['allow'] == ['$APPDATA/recordings/*.wav']
+android_native = (root/'android/llm/src/main/cpp/ai_chat.cpp').read_text(encoding="utf-8")
+for forbidden in ['Formatted and added %s message', 'User prompt received:', 'System prompt received:', 'cached: `%s`']:
+    assert forbidden not in android_native
+entry = (root/'android/app/src/main/java/dev/pivisolutions/dictus/debug/TranscriptionDebugEntry.kt').read_text(encoding="utf-8")
+assert 'val raw: String' not in entry
+assert '.put("raw", JSONObject.NULL)' in entry
+manifest = (root/'android/app/src/main/AndroidManifest.xml').read_text(encoding="utf-8")
+assert 'android:process=":cleanup"' in manifest
+print('Diagnostic text exclusion, worker isolation, and production webview policy verified.')

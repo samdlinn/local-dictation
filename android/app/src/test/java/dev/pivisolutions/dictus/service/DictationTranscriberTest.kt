@@ -164,11 +164,10 @@ class DictationTranscriberTest {
     }
 
     @Test
-    fun `the logged entry is the iOS polish-off event for the engine's own text`() = runTest {
+    fun `diagnostics record only counts and metadata for an ordinary dictation`() = runTest {
         transcriber(engine = { _, _ -> " Bonjour à tous" }).transcribe(halfSecond, "small-q5_1", fixed("fr"))
 
         val entry = debugEntries.single()
-        assertEquals(" Bonjour à tous", entry.raw)
         assertEquals("<APP>", entry.writer)
         assertEquals(NOW_MS, entry.timestampMs)
         val metrics = entry.metrics
@@ -185,7 +184,7 @@ class DictationTranscriberTest {
     @Test
     fun `a take without words is logged, a failure is not`() = runTest {
         transcriber(engine = { _, _ -> " ..." }).transcribe(halfSecond, "tiny", fixed("fr"))
-        assertEquals(" ...", debugEntries.single().raw)
+        assertEquals(4, debugEntries.single().metrics.rawCharCount)
 
         debugEntries.clear()
         transcriber(modelPath = null).transcribe(halfSecond, "tiny", fixed("fr"))

@@ -291,14 +291,6 @@ private fun EntryRow(entry: TranscriptionDebugEntry, onClick: () -> Unit) {
             )
         }
         Text(
-            text = entry.raw,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 13.sp,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(vertical = 4.dp),
-        )
-        Text(
             text = listOfNotNull(
                 entry.writer,
                 metrics.engine,
@@ -377,7 +369,7 @@ private fun EntryDetail(entry: TranscriptionDebugEntry) {
                 "post" to "${timings.postprocessMs} ms",
             )
         }
-        TextBlock(stringResource(R.string.transcription_debug_raw), entry.raw)
+        TextBlock(stringResource(R.string.transcription_debug_raw), stringResource(R.string.transcription_debug_content_not_retained))
         TextBlock(
             stringResource(R.string.transcription_debug_engine_output),
             stringResource(R.string.transcription_debug_no_polish),

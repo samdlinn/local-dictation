@@ -321,7 +321,8 @@
     "modelUnloaded": "تم إلغاء تحميل النموذج",
     "noModelDownloadRequired": "لا يوجد نموذج - التنزيل مطلوب",
     "downloadSpeed": "{{speed}} ميجابايت/ث",
-    "lockedWhileTranscribing": "يمكنك تغيير النموذج بعد انتهاء النسخ في السجل."
+    "lockedWhileTranscribing": "يمكنك تغيير النموذج بعد انتهاء النسخ في السجل.",
+    "downloadingGeneric": "Downloading…"
   },
   "settings": {
     "modelSettings": {
@@ -794,7 +795,8 @@
         "days3": "بعد 3 أيام",
         "weeks2": "بعد أسبوعين",
         "months3": "بعد 3 أشهر",
-        "placeholder": "اختر فترة الاحتفاظ..."
+        "placeholder": "اختر فترة الاحتفاظ...",
+        "historyOff": "History off (no saved dictations)"
       },
       "alwaysOnMicrophone": {
         "label": "ميكروفون يعمل دائماً",

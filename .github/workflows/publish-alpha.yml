@@ -1,7 +1,7 @@
 name: Publish checked alpha packages
 on:
   workflow_run:
-    workflows: ['Build apps']
+    workflows: ["Build apps"]
     types: [completed]
 permissions:
   contents: read
@@ -29,11 +29,12 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
       - name: Sign Android package with the persistent alpha identity
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-        run: python publisher-tools/scripts/sign-android.py release-artifacts/android-arm64/app-debug.apk
+        run: |
+          python publisher-tools/scripts/sign-android.py release-artifacts/android-arm64/app-release-unsigned.apk
       - name: Publish verified packages for their source tag
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

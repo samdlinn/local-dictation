@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Local Dictation</string>
+    <string name="transcription_debug_content_not_retained">Dictation text is not retained in diagnostics.</string>
 
     <!-- Onboarding: Welcome screen (Step 1), the intro carousel (#197, iOS WelcomePage) -->
     <string name="onboarding_intro_walking_title">Speak. Local Dictation writes.</string>

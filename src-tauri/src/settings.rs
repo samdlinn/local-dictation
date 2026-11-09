@@ -1918,22 +1918,23 @@ mod tests {
     }
 
     #[test]
-    fn post_process_defaults_sync_builtin_api_format_but_keep_custom() {
+    fn post_process_defaults_sync_local_provider_without_reintroducing_cloud_defaults() {
         let mut settings = get_default_settings();
-        for provider in settings.post_process_providers.iter_mut() {
-            match provider.id.as_str() {
-                // Settings saved before the built-in provider moved to Messages
-                "anthropic" => provider.api_format = PostProcessApiFormat::OpenAi,
-                "custom" => provider.api_format = PostProcessApiFormat::Anthropic,
-                _ => {}
-            }
-        }
-
+        settings.post_process_providers[0].api_format = PostProcessApiFormat::Anthropic;
+        let mut custom = settings.post_process_providers[0].clone();
+        custom.id = "custom".to_string();
+        settings.post_process_providers.push(custom);
         assert!(ensure_post_process_defaults(&mut settings));
-
-        let format_of = |id: &str| settings.post_process_provider(id).unwrap().api_format;
-        assert_eq!(format_of("anthropic"), PostProcessApiFormat::Anthropic);
-        assert_eq!(format_of("custom"), PostProcessApiFormat::Anthropic);
+        assert_eq!(
+            settings.post_process_provider("local").unwrap().api_format,
+            PostProcessApiFormat::OpenAi
+        );
+        assert_eq!(
+            settings.post_process_provider("custom").unwrap().api_format,
+            PostProcessApiFormat::Anthropic
+        );
+        assert!(settings.post_process_provider("openai").is_none());
+        assert!(settings.post_process_provider("anthropic").is_none());
     }
 
     #[test]

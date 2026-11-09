@@ -321,7 +321,8 @@
     "modelUnloaded": "Model Dikeluarkan dari Memori",
     "noModelDownloadRequired": "Model Belum Tersedia — Perlu Diunduh",
     "downloadSpeed": "{{speed}} MB/s",
-    "lockedWhileTranscribing": "Anda bisa mengganti model setelah transkripsi di Riwayat selesai."
+    "lockedWhileTranscribing": "Anda bisa mengganti model setelah transkripsi di Riwayat selesai.",
+    "downloadingGeneric": "Downloading…"
   },
   "settings": {
     "modelSettings": {
@@ -794,7 +795,8 @@
         "days3": "Setelah 3 hari",
         "weeks2": "Setelah 2 minggu",
         "months3": "Setelah 3 bulan",
-        "placeholder": "Pilih masa penyimpanan..."
+        "placeholder": "Pilih masa penyimpanan...",
+        "historyOff": "History off (no saved dictations)"
       },
       "alwaysOnMicrophone": {
         "label": "Mikrofon Selalu Aktif",

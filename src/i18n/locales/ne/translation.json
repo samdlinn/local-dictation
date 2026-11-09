@@ -321,7 +321,8 @@
     "modelUnloaded": "मोडेल अनलोड गरियो",
     "noModelDownloadRequired": "मोडेल छैन - डाउनलोड आवश्यक",
     "downloadSpeed": "{{speed}} MB/s",
-    "lockedWhileTranscribing": "हिस्ट्रीमा ट्रान्सक्रिप्सन सकिएपछि तपाईं मोडेल परिवर्तन गर्न सक्नुहुन्छ।"
+    "lockedWhileTranscribing": "हिस्ट्रीमा ट्रान्सक्रिप्सन सकिएपछि तपाईं मोडेल परिवर्तन गर्न सक्नुहुन्छ।",
+    "downloadingGeneric": "Downloading…"
   },
   "settings": {
     "modelSettings": {
@@ -794,7 +795,8 @@
         "days3": "3 दिनपछि",
         "weeks2": "2 हप्तापछि",
         "months3": "3 महिनापछि",
-        "placeholder": "राख्ने अवधि चयन गर्नुहोस्..."
+        "placeholder": "राख्ने अवधि चयन गर्नुहोस्...",
+        "historyOff": "History off (no saved dictations)"
       },
       "alwaysOnMicrophone": {
         "label": "सधैँ-सक्रिय माइक्रोफोन",

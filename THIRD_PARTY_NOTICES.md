@@ -15,3 +15,7 @@ The microphone artwork in app-icon.svg was created for this project. Original up
 Additional dependency licenses are listed in package manifests and lockfiles. The Android app includes a generated open-source license screen.
 
 Android local cleanup reuses the JNI inference module from OpenWispr revision `0bf53cad34dfbbf36685a83420cb1b9580ae92b4` (MIT; licenses/OPENWISPR-LICENSE.txt), including its vendored llama.cpp and notices. The JNI wrapper derives from Arm AI Chat; any original notices in the imported source are retained.
+
+## GLib GTK3 compatibility backport
+
+`src-tauri/vendor/glib` contains MIT-licensed glib 0.18.5 with the upstream RUSTSEC-2024-0429 mutability fix backported from https://github.com/gtk-rs/gtk-rs-core/pull/1343. The original license is retained in that directory; see `LOCAL_PATCH.md`.

@@ -97,6 +97,31 @@ fn split_language(language: Option<LanguageDecision>) -> (Option<String>, Option
     }
 }
 
+fn open_history_connection(path: &std::path::Path) -> Result<Connection> {
+    let conn = Connection::open(path)?;
+    conn.pragma_update(None, "secure_delete", true)?;
+    Ok(conn)
+}
+
+fn sanitize_legacy_history(conn: &Connection) -> Result<()> {
+    conn.execute_batch(
+        "CREATE TABLE IF NOT EXISTS local_privacy_migrations (id TEXT PRIMARY KEY)",
+    )?;
+    let done: bool = conn.query_row(
+        "SELECT EXISTS(SELECT 1 FROM local_privacy_migrations WHERE id='retention-v2')",
+        [],
+        |r| r.get(0),
+    )?;
+    if !done {
+        conn.execute_batch("VACUUM")?;
+        conn.execute(
+            "INSERT INTO local_privacy_migrations(id) VALUES ('retention-v2')",
+            [],
+        )?;
+    }
+    Ok(())
+}
+
 impl HistoryManager {
     pub fn new(app_handle: &AppHandle) -> Result<Self> {
         // Create recordings directory in app data dir
@@ -118,6 +143,9 @@ impl HistoryManager {
 
         // Initialize database and run migrations synchronously
         manager.init_database()?;
+        manager.cleanup_old_entries()?;
+        manager.sanitize_legacy_storage()?;
+        manager.remove_orphan_recordings()?;
 
         Ok(manager)
     }
@@ -125,7 +153,7 @@ impl HistoryManager {
     fn init_database(&self) -> Result<()> {
         info!("Initializing database at {:?}", self.db_path);
 
-        let mut conn = Connection::open(&self.db_path)?;
+        let mut conn = open_history_connection(&self.db_path)?;
 
         // Handle migration from tauri-plugin-sql to rusqlite_migration
         // tauri-plugin-sql used _sqlx_migrations table, rusqlite_migration uses user_version pragma
@@ -252,7 +280,7 @@ impl HistoryManager {
     }
 
     fn get_connection(&self) -> Result<Connection> {
-        Ok(Connection::open(&self.db_path)?)
+        open_history_connection(&self.db_path)
     }
 
     fn map_history_entry(row: &rusqlite::Row<'_>) -> rusqlite::Result<HistoryEntry> {
@@ -279,17 +307,45 @@ impl HistoryManager {
         &self.recordings_dir
     }
 
+    pub fn retains_dictations(&self) -> bool {
+        let settings = crate::settings::get_settings(&self.app_handle);
+        settings.recording_retention_period
+            != crate::settings::RecordingRetentionPeriod::PreserveLimit
+            || settings.history_limit > 0
+    }
+
+    // Vacuum once to remove recoverable deleted text left by the first alpha.
+    // Retained history and imported files are preserved. Backups are outside this file.
+    fn sanitize_legacy_storage(&self) -> Result<()> {
+        sanitize_legacy_history(&self.get_connection()?)
+    }
+
+    fn remove_orphan_recordings(&self) -> Result<()> {
+        let conn = self.get_connection()?;
+        let mut statement = conn.prepare("SELECT file_name FROM transcription_history")?;
+        let referenced: std::collections::HashSet<String> = statement
+            .query_map([], |r| r.get(0))?
+            .collect::<rusqlite::Result<_>>()?;
+        crate::recording_storage::remove_unreferenced(&self.recordings_dir, &referenced)?;
+        Ok(())
+    }
+
     /// Save a new history entry to the database.
     /// The WAV file should already have been written to the recordings directory.
     pub fn save_entry(
         &self,
-        file_name: String,
+        recording: crate::recording_storage::PendingRecording,
         transcription_text: String,
         post_process_requested: bool,
         post_processed_text: Option<String>,
         post_process_prompt: Option<String>,
         language: Option<LanguageDecision>,
-    ) -> Result<HistoryEntry> {
+    ) -> Result<Option<HistoryEntry>> {
+        // Recheck at commit: settings may have changed while inference was running.
+        if !self.retains_dictations() {
+            return Ok(None);
+        }
+        let file_name = recording.file_name();
         let (language, language_source) = split_language(language);
         let entry = self.insert_entry(HistoryEntry {
             id: 0,
@@ -306,9 +362,10 @@ impl HistoryManager {
             language_source,
         })?;
 
+        recording.retain();
         self.cleanup_old_entries()?;
 
-        Ok(entry)
+        Ok(Some(entry))
     }
 
     /// Save the entry for a file whose audio is already at `file_name`.
@@ -734,6 +791,56 @@ impl HistoryManager {
 mod tests {
     use super::*;
     use rusqlite::{params, Connection};
+
+    #[test]
+    fn privacy_regression_deleted_transcripts_are_not_readable_in_database_bytes() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("history.db");
+        let mut conn = super::open_history_connection(&path).unwrap();
+        HistoryManager::apply_migrations(&mut conn).unwrap();
+        let secret = "SYNTHETIC_PRIVATE_DICTATION_FOR_DELETE_REGRESSION".repeat(10);
+        insert_entry(&conn, 100, &secret, None);
+        conn.execute("DELETE FROM transcription_history", [])
+            .unwrap();
+        drop(conn);
+        assert!(!fs::read(&path)
+            .unwrap()
+            .windows(secret.len())
+            .any(|b| b == secret.as_bytes()));
+    }
+
+    #[test]
+    fn privacy_regression_migration_scrubs_legacy_deleted_text_and_preserves_kept_rows() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("history.db");
+        let mut old = Connection::open(&path).unwrap();
+        HistoryManager::apply_migrations(&mut old).unwrap();
+        let secret = "SYNTHETIC_LEGACY_DELETED_TRANSCRIPT".repeat(10);
+        insert_entry(&old, 100, &secret, None);
+        insert_entry(&old, 200, "intentionally retained", None);
+        old.execute("DELETE FROM transcription_history WHERE timestamp=100", [])
+            .unwrap();
+        drop(old);
+        assert!(fs::read(&path)
+            .unwrap()
+            .windows(secret.len())
+            .any(|b| b == secret.as_bytes()));
+        let conn = super::open_history_connection(&path).unwrap();
+        super::sanitize_legacy_history(&conn).unwrap();
+        super::sanitize_legacy_history(&conn).unwrap();
+        assert_eq!(
+            HistoryManager::get_latest_entry_with_conn(&conn)
+                .unwrap()
+                .unwrap()
+                .transcription_text,
+            "intentionally retained"
+        );
+        drop(conn);
+        assert!(!fs::read(&path)
+            .unwrap()
+            .windows(secret.len())
+            .any(|b| b == secret.as_bytes()));
+    }
 
     fn setup_conn() -> Connection {
         let conn = Connection::open_in_memory().expect("open in-memory db");

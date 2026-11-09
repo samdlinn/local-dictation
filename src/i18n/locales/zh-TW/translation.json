@@ -321,7 +321,8 @@
     "modelUnloaded": "模型已卸載",
     "noModelDownloadRequired": "無模型 - 需要下載",
     "downloadSpeed": "{{speed}} MB/s",
-    "lockedWhileTranscribing": "歷史紀錄中的轉錄完成後才能更換模型。"
+    "lockedWhileTranscribing": "歷史紀錄中的轉錄完成後才能更換模型。",
+    "downloadingGeneric": "Downloading…"
   },
   "settings": {
     "modelSettings": {
@@ -794,7 +795,8 @@
         "days3": "3 天後",
         "weeks2": "2 週後",
         "months3": "3 個月後",
-        "placeholder": "選擇保留期限..."
+        "placeholder": "選擇保留期限...",
+        "historyOff": "History off (no saved dictations)"
       },
       "alwaysOnMicrophone": {
         "label": "麥克風常開",

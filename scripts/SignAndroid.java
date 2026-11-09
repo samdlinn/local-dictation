@@ -1,5 +1,9 @@
 import com.android.apksig.ApkSigner;
 import com.android.apksig.ApkVerifier;
+import com.android.apksig.apk.ApkUtils;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.zip.ZipFile;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +17,14 @@ import java.util.List;
 
 class SignAndroid {
     public static void main(String[] args) throws Exception {
+        try (var archive = new ZipFile(args[0])) {
+            var manifest = ByteBuffer.wrap(archive.getInputStream(archive.getEntry("AndroidManifest.xml")).readAllBytes()).order(ByteOrder.LITTLE_ENDIAN);
+            if (ApkUtils.getDebuggableFromBinaryAndroidManifest(manifest.duplicate()) ||
+                !"dev.samdlinn.localdictation".equals(ApkUtils.getPackageNameFromBinaryAndroidManifest(manifest.duplicate())) ||
+                ApkUtils.getVersionCodeFromBinaryAndroidManifest(manifest.duplicate()) < 2) {
+                throw new IllegalStateException("Publication requires the expected non-debuggable release APK and an upgrade version code");
+            }
+        }
         var keys = KeyStore.getInstance("PKCS12");
         try (var stream = Files.newInputStream(Path.of(args[2]))) {
             keys.load(stream, "android".toCharArray());

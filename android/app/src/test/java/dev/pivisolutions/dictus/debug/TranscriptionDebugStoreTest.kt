@@ -25,6 +25,24 @@ class TranscriptionDebugStoreTest {
     private fun store() = TranscriptionDebugStore(file, now = { nowMs })
 
     @Test
+    fun `legacy raw text diagnostics are removed before any read`() {
+        val legacy = File(folder.root, TranscriptionDebugStore.LEGACY_FILE_NAME)
+        legacy.writeText("SYNTHETIC_PRIVATE_DICTATION")
+        assertTrue(store().readAll().isEmpty())
+        assertFalse(legacy.exists())
+    }
+
+    @Test
+    fun `stored diagnostics never serialize transcript bodies`() {
+        store().append(entry("metrics-only", ageMs = 0))
+        val json = org.json.JSONObject(file.readText().trim())
+        assertTrue(json.isNull("raw"))
+        assertTrue(json.isNull("polished"))
+        assertTrue(json.isNull("vocabularyCorrected"))
+        assertEquals(8, json.getJSONObject("metrics").getInt("rawCharCount"))
+    }
+
+    @Test
     fun `an appended entry reads back whole, one JSON line each`() {
         val store = store()
         val first = entry("A", ageMs = 2_000)
@@ -83,7 +101,6 @@ class TranscriptionDebugStoreTest {
         id = id,
         // The log keeps whole seconds, as iOS's ISO 8601 encoder does.
         timestampMs = (nowMs - ageMs) / 1_000 * 1_000,
-        raw = " Bonjour",
         writer = "<KBD>",
         metrics = TranscriptionDebugMetrics(
             detectedLanguage = null,

@@ -22,6 +22,7 @@ mod notices;
 mod overlay;
 mod paste_tx;
 pub mod portable;
+mod recording_storage;
 mod secure_input;
 mod settings;
 mod shortcut;
@@ -214,6 +215,14 @@ fn initialize_core_logic(app_handle: &AppHandle) {
     );
     let history_manager =
         Arc::new(HistoryManager::new(app_handle).expect("Failed to initialize history manager"));
+
+    app_handle
+        .asset_protocol_scope()
+        .allow_directory(history_manager.recordings_dir(), false)
+        .expect("Failed to scope recording playback");
+    tauri_plugin_fs::FsExt::fs_scope(app_handle)
+        .allow_directory(history_manager.recordings_dir(), false)
+        .expect("Failed to scope recording reads");
 
     // Add managers to Tauri's managed state
     app_handle.manage(recording_manager.clone());

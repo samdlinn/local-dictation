@@ -321,7 +321,8 @@
     "modelUnloaded": "Model alliberat de la memòria",
     "noModelDownloadRequired": "No hi ha cap model: cal baixar-ne un",
     "downloadSpeed": "{{speed}} MB/s",
-    "lockedWhileTranscribing": "Podràs canviar de model quan acabi la transcripció a l'Historial."
+    "lockedWhileTranscribing": "Podràs canviar de model quan acabi la transcripció a l'Historial.",
+    "downloadingGeneric": "Downloading…"
   },
   "settings": {
     "modelSettings": {
@@ -794,7 +795,8 @@
         "days3": "Al cap de 3 dies",
         "weeks2": "Al cap de 2 setmanes",
         "months3": "Al cap de 3 mesos",
-        "placeholder": "Selecciona el període de conservació..."
+        "placeholder": "Selecciona el període de conservació...",
+        "historyOff": "History off (no saved dictations)"
       },
       "alwaysOnMicrophone": {
         "label": "Micròfon sempre actiu",

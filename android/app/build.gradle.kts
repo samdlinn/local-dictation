@@ -222,7 +222,7 @@ android {
         }
         release {
             buildConfigField("int", "PARAKEET_MIN_RAM_GB", "6")
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = if (System.getenv("SIGNING_KEYSTORE_PATH") != null) signingConfigs.getByName("release") else null
             isMinifyEnabled = false
         }
     }

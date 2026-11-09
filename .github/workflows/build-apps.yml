@@ -12,6 +12,19 @@ on:
 permissions:
   contents: read
 jobs:
+  security:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.4"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: bun install --frozen-lockfile
+      - run: bun audit
+      - run: python scripts/audit-dependencies.py
   desktop:
     if: inputs.target != 'android'
     strategy:
@@ -38,9 +51,18 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake clang libclang-dev libevdev-dev libasound2-dev pkg-config libssl-dev libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libgtk-layer-shell-dev libopenblas-dev patchelf libfuse2t64 xvfb
+      - name: Test GLib security backport with optimizations
+        if: runner.os == 'Linux'
+        run: cargo test --manifest-path src-tauri/vendor/glib/Cargo.toml --release variant_iter::tests
       - run: bun install --frozen-lockfile
       - run: python scripts/check-local-policy.py
       - run: bun run lint
+      - name: Test desktop privacy and cleanup
+        env:
+          CMAKE_POLICY_VERSION_MINIMUM: "3.5"
+        run: |
+          cargo test --manifest-path src-tauri/Cargo.toml --lib privacy_regression
+          cargo test --manifest-path src-tauri/Cargo.toml --lib local_cleanup::tests
       - name: Build offline cleanup engine
         run: python scripts/prepare-local-runtime.py
       - name: Build desktop installer
@@ -65,8 +87,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     env:
-      VERSION_NAME: "0.1.0"
-      VERSION_CODE: "1"
+      VERSION_NAME: "0.1.1-alpha.2"
+      VERSION_CODE: "2"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -82,10 +104,10 @@ jobs:
         run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0' 'ndk;27.2.12479018' 'cmake;3.31.6' 'cmake;3.22.1'
       - name: Test and build Android app
         working-directory: android
-        run: ./gradlew :app:assembleDebug :core:testDebugUnitTest --no-daemon
+        run: ./gradlew :app:assembleRelease :core:testDebugUnitTest :app:testDebugUnitTest --no-daemon
       - uses: actions/upload-artifact@v4
         with:
           name: android-arm64
           retention-days: 1
           if-no-files-found: error
-          path: android/app/build/outputs/apk/debug/*.apk
+          path: android/app/build/outputs/apk/release/*.apk

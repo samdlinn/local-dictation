@@ -321,7 +321,8 @@
     "modelUnloaded": "Модель вивантажена",
     "noModelDownloadRequired": "Немає моделі - потрібно завантажити",
     "downloadSpeed": "{{speed}} MB/s",
-    "lockedWhileTranscribing": "Модель можна буде змінити, коли завершиться розшифрування в Історії."
+    "lockedWhileTranscribing": "Модель можна буде змінити, коли завершиться розшифрування в Історії.",
+    "downloadingGeneric": "Downloading…"
   },
   "settings": {
     "modelSettings": {
@@ -794,7 +795,8 @@
         "days3": "Через 3 дні",
         "weeks2": "Через 2 тижні",
         "months3": "Через 3 місяці",
-        "placeholder": "Оберіть період зберігання..."
+        "placeholder": "Оберіть період зберігання...",
+        "historyOff": "History off (no saved dictations)"
       },
       "alwaysOnMicrophone": {
         "label": "Постійно активний мікрофон",

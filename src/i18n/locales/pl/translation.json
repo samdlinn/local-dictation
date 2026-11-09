@@ -321,7 +321,8 @@
     "modelUnloaded": "Model wyładowany",
     "noModelDownloadRequired": "Brak modelu – wymagane pobranie",
     "downloadSpeed": "{{speed}} MB/s",
-    "lockedWhileTranscribing": "Model będzie można zmienić po zakończeniu transkrypcji w Historii."
+    "lockedWhileTranscribing": "Model będzie można zmienić po zakończeniu transkrypcji w Historii.",
+    "downloadingGeneric": "Downloading…"
   },
   "settings": {
     "modelSettings": {
@@ -794,7 +795,8 @@
         "days3": "Po 3 dniach",
         "weeks2": "Po 2 tygodniach",
         "months3": "Po 3 miesiącach",
-        "placeholder": "Wybierz okres retencji..."
+        "placeholder": "Wybierz okres retencji...",
+        "historyOff": "History off (no saved dictations)"
       },
       "alwaysOnMicrophone": {
         "label": "Mikrofon zawsze aktywny",

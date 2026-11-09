@@ -740,45 +740,36 @@ impl ShortcutAction for TranscribeAction {
                     set_tray_state(&ah, TrayIconState::Idle);
                     emit_transcription_complete(&ah, empty_outcome(input_silent), 0, stop_time);
                 } else {
-                    // Save WAV concurrently with transcription
+                    // No recording is written when history is off. The worker owns its
+                    // temporary file until we receive it; even an abandoned join cleans up.
                     let sample_count = samples.len();
-                    let file_name = format!("handy-{}.wav", chrono::Utc::now().timestamp());
-                    let wav_path = hm.recordings_dir().join(&file_name);
-                    let wav_path_for_verify = wav_path.clone();
-                    let samples_for_wav = samples.clone();
-                    let wav_handle = tauri::async_runtime::spawn_blocking(move || {
-                        crate::audio_toolkit::save_wav_file(&wav_path, &samples_for_wav)
-                    });
-
-                    // Transcribe concurrently with WAV save: the live decode's
-                    // result when it has one (all audio was already fed to it),
-                    // otherwise a batch run of the samples. A cancel is surfaced
-                    // as an error, so it never starts a batch run.
+                    let retain_audio = hm.retains_dictations();
+                    let wav_handle = if retain_audio {
+                        let directory = hm.recordings_dir().to_owned();
+                        let audio = samples.clone();
+                        Some(tauri::async_runtime::spawn_blocking(move || {
+                            crate::recording_storage::PendingRecording::save_if_enabled(
+                                &directory, &audio, true,
+                            )
+                        }))
+                    } else {
+                        None
+                    };
                     let transcription_time = Instant::now();
                     let transcription_result = tm.transcribe_recording(samples);
-
-                    // Await WAV save and verify
-                    let wav_saved = match wav_handle.await {
-                        Ok(Ok(())) => {
-                            match crate::audio_toolkit::verify_wav_file(
-                                &wav_path_for_verify,
-                                sample_count,
-                            ) {
-                                Ok(()) => true,
-                                Err(e) => {
-                                    error!("WAV verification failed: {}", e);
-                                    false
-                                }
+                    let recording = match wav_handle {
+                        Some(task) => match task.await {
+                            Ok(Ok(recording)) => recording,
+                            Ok(Err(_)) => {
+                                error!("Failed to save recording");
+                                None
                             }
-                        }
-                        Ok(Err(e)) => {
-                            error!("Failed to save WAV file: {}", e);
-                            false
-                        }
-                        Err(e) => {
-                            error!("WAV save task panicked: {}", e);
-                            false
-                        }
+                            Err(_) => {
+                                error!("Recording writer failed");
+                                None
+                            }
+                        },
+                        None => None,
                     };
 
                     if rm.was_cancelled_since(cancel_generation) {
@@ -825,20 +816,6 @@ impl ShortcutAction for TranscribeAction {
                                 return;
                             }
 
-                            // Save to history if WAV was saved
-                            if wav_saved {
-                                if let Err(err) = hm.save_entry(
-                                    file_name,
-                                    transcription,
-                                    post_process,
-                                    processed.post_processed_text.clone(),
-                                    processed.post_process_prompt.clone(),
-                                    language,
-                                ) {
-                                    error!("Failed to save history entry: {}", err);
-                                }
-                            }
-
                             // The user's hook only changes what gets pasted;
                             // history above keeps the text as produced.
                             let Some(final_text) = complete_unless_cancelled(
@@ -852,6 +829,25 @@ impl ShortcutAction for TranscribeAction {
                                 set_tray_state(&ah, TrayIconState::Idle);
                                 return;
                             };
+
+                            if rm.was_cancelled_since(cancel_generation) {
+                                return;
+                            }
+                            if let Some(recording) = recording {
+                                if hm
+                                    .save_entry(
+                                        recording,
+                                        transcription,
+                                        post_process,
+                                        processed.post_processed_text.clone(),
+                                        processed.post_process_prompt.clone(),
+                                        language,
+                                    )
+                                    .is_err()
+                                {
+                                    error!("Failed to save history entry");
+                                }
+                            }
 
                             if final_text.is_empty() {
                                 utils::hide_recording_overlay(&ah);
@@ -977,9 +973,9 @@ impl ShortcutAction for TranscribeAction {
                                 .with_detail(err.to_string()),
                             );
                             // Save entry with empty text so user can retry
-                            if wav_saved {
+                            if let Some(recording) = recording {
                                 if let Err(save_err) = hm.save_entry(
-                                    file_name,
+                                    recording,
                                     String::new(),
                                     post_process,
                                     None,
@@ -1087,7 +1083,6 @@ mod tests {
     };
     use crate::settings::{get_default_settings, AppSettings, OverlayStyle};
     use std::future;
-    use std::io::{Read, Write};
     use std::net::TcpListener;
     use std::sync::atomic::{AtomicBool, Ordering};
     use std::sync::Arc;
@@ -1114,23 +1109,6 @@ mod tests {
     }
 
     /// Answers one chat completion request with `body`, and returns its URL.
-    fn serve_once(body: &'static str) -> String {
-        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
-        let address = listener.local_addr().unwrap();
-        thread::spawn(move || {
-            let (mut stream, _) = listener.accept().unwrap();
-            let mut request = [0; 8192];
-            let _ = stream.read(&mut request);
-            let response = format!(
-                "HTTP/1.1 200 OK\r\ncontent-type: application/json\r\ncontent-length: {}\r\nconnection: close\r\n\r\n{}",
-                body.len(),
-                body
-            );
-            stream.write_all(response.as_bytes()).unwrap();
-        });
-        format!("http://{address}")
-    }
-
     fn run_post_process(settings: &AppSettings, transcription: &str) -> PostProcessOutcome {
         tauri::async_runtime::block_on(post_process_transcription(settings, transcription))
     }
@@ -1152,20 +1130,17 @@ mod tests {
     }
 
     #[test]
-    fn a_post_processing_reply_is_done() {
-        let url = serve_once(r#"{"choices":[{"message":{"content":"polished"}}]}"#);
+    fn privacy_regression_legacy_post_processing_does_not_contact_an_endpoint() {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        listener.set_nonblocking(true).unwrap();
+        let url = format!("http://{}", listener.local_addr().unwrap());
         assert_eq!(
-            run_post_process(&post_process_settings(&url), "hello"),
-            PostProcessOutcome::Done("polished".to_string())
-        );
-    }
-
-    #[test]
-    fn a_post_processing_reply_with_no_content_failed() {
-        let url = serve_once(r#"{"choices":[]}"#);
-        assert_eq!(
-            run_post_process(&post_process_settings(&url), "hello"),
+            run_post_process(&post_process_settings(&url), "synthetic dictation"),
             PostProcessOutcome::Failed
+        );
+        assert_eq!(
+            listener.accept().unwrap_err().kind(),
+            std::io::ErrorKind::WouldBlock
         );
     }
 

@@ -321,7 +321,8 @@
     "modelUnloaded": "Model Unloaded",
     "noModelDownloadRequired": "No Model - Download Required",
     "downloadSpeed": "{{speed}} MB/s",
-    "lockedWhileTranscribing": "You can switch models once History finishes transcribing."
+    "lockedWhileTranscribing": "You can switch models once History finishes transcribing.",
+    "downloadingGeneric": "Downloading…"
   },
   "settings": {
     "modelSettings": {
@@ -794,7 +795,8 @@
         "days3": "After 3 days",
         "weeks2": "After 2 weeks",
         "months3": "After 3 months",
-        "placeholder": "Select retention period..."
+        "placeholder": "Select retention period...",
+        "historyOff": "History off (no saved dictations)"
       },
       "alwaysOnMicrophone": {
         "label": "Always-On Microphone",

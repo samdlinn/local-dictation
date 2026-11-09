@@ -38,6 +38,16 @@ static llama_context                    * g_context;
 static llama_batch                        g_batch;
 static common_chat_templates_ptr          g_chat_templates;
 static common_sampler                   * g_sampler;
+static bool g_batch_allocated = false;
+
+// Idempotent, including failure between model load and context/sampler creation.
+static void release_resources() {
+    if (g_sampler) { common_sampler_free(g_sampler); g_sampler = nullptr; }
+    g_chat_templates.reset();
+    if (g_batch_allocated) { llama_batch_free(g_batch); g_batch = {}; g_batch_allocated = false; }
+    if (g_context) { llama_free(g_context); g_context = nullptr; }
+    if (g_model) { llama_model_free(g_model); g_model = nullptr; }
+}
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -59,6 +69,7 @@ Java_com_arm_aichat_internal_InferenceEngineImpl_init(JNIEnv *env, jobject /*unu
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_arm_aichat_internal_InferenceEngineImpl_load(JNIEnv *env, jobject, jstring jmodel_path) {
+    release_resources();
     llama_model_params model_params = llama_model_default_params();
 
     const auto *model_path = env->GetStringUTFChars(jmodel_path, 0);
@@ -114,9 +125,10 @@ extern "C"
 JNIEXPORT jint JNICALL
 Java_com_arm_aichat_internal_InferenceEngineImpl_prepare(JNIEnv * /*env*/, jobject /*unused*/) {
     auto *context = init_context(g_model);
-    if (!context) { return 1; }
+    if (!context) { release_resources(); return 1; }
     g_context = context;
     g_batch = llama_batch_init(BATCH_SIZE, 0, 1);
+    g_batch_allocated = true;
     g_chat_templates = common_chat_templates_init(g_model, "");
     g_sampler = new_sampler(DEFAULT_SAMPLER_TEMP);
     return 0;
@@ -265,7 +277,7 @@ static void reset_long_term_states(const bool clear_kv_cache = true) {
     system_prompt_position = 0;
     current_position = 0;
 
-    if (clear_kv_cache)
+    if (clear_kv_cache && g_context)
         llama_memory_clear(llama_get_memory(g_context), false);
 }
 
@@ -293,7 +305,7 @@ static std::string chat_add_and_format(const std::string &role, const std::strin
     auto formatted = common_chat_format_single(
             g_chat_templates.get(), chat_msgs, new_msg, role == ROLE_USER, /* use_jinja */ false);
     chat_msgs.push_back(new_msg);
-    LOGi("%s: Formatted and added %s message: \n%s\n", __func__, role.c_str(), formatted.c_str());
+
     return formatted;
 }
 
@@ -363,7 +375,7 @@ Java_com_arm_aichat_internal_InferenceEngineImpl_processSystemPrompt(
 
     // Obtain system prompt from JEnv
     const auto *system_prompt = env->GetStringUTFChars(jsystem_prompt, nullptr);
-    LOGd("%s: System prompt received: \n%s", __func__, system_prompt);
+
     std::string formatted_system_prompt(system_prompt);
 
     // Format system prompt if applicable
@@ -376,9 +388,7 @@ Java_com_arm_aichat_internal_InferenceEngineImpl_processSystemPrompt(
     // Tokenize system prompt
     const auto system_tokens = common_tokenize(g_context, formatted_system_prompt,
                                                has_chat_template, has_chat_template);
-    for (auto id: system_tokens) {
-        LOGv("token: `%s`\t -> `%d`", common_token_to_piece(g_context, id).c_str(), id);
-    }
+
 
     // Handle context overflow
     const int max_batch_size = DEFAULT_CONTEXT_SIZE - OVERFLOW_HEADROOM;
@@ -412,7 +422,7 @@ Java_com_arm_aichat_internal_InferenceEngineImpl_processUserPrompt(
 
     // Obtain and tokenize user prompt
     const auto *const user_prompt = env->GetStringUTFChars(juser_prompt, nullptr);
-    LOGd("%s: User prompt received: \n%s", __func__, user_prompt);
+
     std::string formatted_user_prompt(user_prompt);
 
     // Format user prompt if applicable
@@ -424,9 +434,7 @@ Java_com_arm_aichat_internal_InferenceEngineImpl_processUserPrompt(
 
     // Decode formatted user prompts
     auto user_tokens = common_tokenize(g_context, formatted_user_prompt, has_chat_template, has_chat_template);
-    for (auto id: user_tokens) {
-        LOGv("token: `%s`\t -> `%d`", common_token_to_piece(g_context, id).c_str(), id);
-    }
+
 
     // Ensure user prompt doesn't exceed the context size by truncating if necessary.
     const int user_prompt_size = (int) user_tokens.size();
@@ -445,7 +453,7 @@ Java_com_arm_aichat_internal_InferenceEngineImpl_processUserPrompt(
 
     // Update position
     current_position += user_prompt_size;
-    stop_generation_position = current_position + user_prompt_size + n_predict;
+    stop_generation_position = current_position + n_predict;
     return 0;
 }
 
@@ -531,7 +539,7 @@ Java_com_arm_aichat_internal_InferenceEngineImpl_generateNextToken(
     jstring result = nullptr;
     if (is_valid_utf8(cached_token_chars.c_str())) {
         result = env->NewStringUTF(cached_token_chars.c_str());
-        LOGv("id: %d,\tcached: `%s`,\tnew: `%s`", new_token_id, cached_token_chars.c_str(), new_token_chars.c_str());
+
 
         assistant_ss << cached_token_chars;
         cached_token_chars.clear();
@@ -551,11 +559,7 @@ Java_com_arm_aichat_internal_InferenceEngineImpl_unload(JNIEnv * /*unused*/, job
     reset_short_term_states();
 
     // Free up resources
-    common_sampler_free(g_sampler);
-    g_chat_templates.reset();
-    llama_batch_free(g_batch);
-    llama_free(g_context);
-    llama_model_free(g_model);
+    release_resources();
 }
 
 extern "C"

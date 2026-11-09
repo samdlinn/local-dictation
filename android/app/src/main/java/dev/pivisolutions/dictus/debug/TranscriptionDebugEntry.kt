@@ -13,13 +13,12 @@ import java.time.Instant
  * polish toggle off (`skippedToggleOff`, `PolishService.swift:1057-1075`), and the keys only the polish
  * or the smart modes fill are written as null (see [toJson]).
  *
- * @param raw the speech engine's own output, before any cleanup (iOS `raw`).
+ * Diagnostic entries contain metrics only; dictated text is never retained.
  * @param writer `<KBD>` or `<APP>`: the surface that started the dictation (iOS `writer`).
  */
 data class TranscriptionDebugEntry(
     val id: String,
     val timestampMs: Long,
-    val raw: String,
     val writer: String?,
     val metrics: TranscriptionDebugMetrics,
 ) {
@@ -28,7 +27,7 @@ data class TranscriptionDebugEntry(
     fun toJson(): JSONObject = JSONObject()
         .put("id", id)
         .put("timestamp", isoTimestamp(timestampMs))
-        .put("raw", raw)
+        .put("raw", JSONObject.NULL)
         .put("vocabularyCorrected", JSONObject.NULL)
         .put("polished", JSONObject.NULL)
         .put("writer", writer ?: JSONObject.NULL)
@@ -43,7 +42,6 @@ data class TranscriptionDebugEntry(
             TranscriptionDebugEntry(
                 id = json.getString("id"),
                 timestampMs = Instant.parse(json.getString("timestamp")).toEpochMilli(),
-                raw = json.getString("raw"),
                 writer = json.stringOrNull("writer"),
                 metrics = TranscriptionDebugMetrics.fromJson(json.getJSONObject("metrics")),
             )

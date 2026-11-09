@@ -321,7 +321,8 @@
     "modelUnloaded": "Моделът е разтоварен",
     "noModelDownloadRequired": "Няма модел – необходимо е изтегляне",
     "downloadSpeed": "{{speed}} MB/s",
-    "lockedWhileTranscribing": "Можете да смените модела, след като транскрибирането в История приключи."
+    "lockedWhileTranscribing": "Можете да смените модела, след като транскрибирането в История приключи.",
+    "downloadingGeneric": "Downloading…"
   },
   "settings": {
     "modelSettings": {
@@ -794,7 +795,8 @@
         "days3": "След 3 дни",
         "weeks2": "След 2 седмици",
         "months3": "След 3 месеца",
-        "placeholder": "Изберете период на съхранение..."
+        "placeholder": "Изберете период на съхранение...",
+        "historyOff": "History off (no saved dictations)"
       },
       "alwaysOnMicrophone": {
         "label": "Постоянно активен микрофон",

@@ -18,7 +18,7 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:label="Dictus"
+        android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
 
@@ -31,6 +31,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Native cleanup is disposable: a deadline or crash cannot hang the keyboard. -->
+        <service
+            android:name=".localcleanup.CleanupWorkerService"
+            android:exported="false"
+            android:process=":cleanup" />
 
         <service
             android:name=".service.DictationService"

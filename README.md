@@ -13,9 +13,9 @@ Download a package from [Releases](https://github.com/samdlinn/local-dictation/r
 | Platform | Package | Status |
 | --- | --- | --- |
 | Apple Silicon Mac | DMG | Alpha download available; app startup checked, microphone and paste validation pending |
-| Other Mac builds | DMG for the architecture shown in its filename | Build pipeline |
+| Intel Mac | None yet | Additional architecture build pending |
 | Windows 10 and 11 x64 | Setup EXE | Alpha download available; installation and native startup pass on the Windows runner; Windows 10 device test pending |
-| Ubuntu Linux x64 | DEB or AppImage | Build pipeline; Wayland integration varies by desktop |
+| Ubuntu Linux x64 | DEB or AppImage | Alpha downloads available; DEB native startup checked; Wayland integration varies by desktop |
 | Android arm64, Android 10+ | APK | Alpha download available; build, core tests, signing, and native alignment checked; physical-device validation pending |
 | iPhone | None yet | Optional and deferred; no paid developer membership required by this project |
 

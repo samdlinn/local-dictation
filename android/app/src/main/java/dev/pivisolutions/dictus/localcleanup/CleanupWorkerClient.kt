@@ -28,7 +28,7 @@ internal class CleanupWorkerClient(private val context: Context) : CleanupSessio
     @Volatile private var remote: Messenger? = null
     @Volatile private var pid = 0
     @Volatile private var input = ""
-    private val reply = Messenger(Handler(Looper.getMainLooper()) { message ->
+    private val reply: Messenger = Messenger(Handler(Looper.getMainLooper()) { message ->
         when (message.what) {
             CleanupWorkerService.HELLO -> {
                 if (message.arg2 != Process.myUid() || message.arg1 <= 0 || message.arg1 == Process.myPid()) {
@@ -49,7 +49,7 @@ internal class CleanupWorkerClient(private val context: Context) : CleanupSessio
         true
     })
     // A method avoids referencing a property from its own initialization lambda.
-    private fun replyMessenger() = reply
+    private fun replyMessenger(): Messenger = reply
     private fun failed() { result.completeExceptionally(IllegalStateException("Cleanup worker unavailable")) }
 
     private val connection = object : ServiceConnection {

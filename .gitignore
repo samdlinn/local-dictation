@@ -57,3 +57,7 @@ src-tauri/resources/bin/*
 *.apk
 *.exe
 *.msi
+
+# Standalone tests for the vendored security backport
+/src-tauri/vendor/glib/target/
+/src-tauri/vendor/glib/Cargo.lock

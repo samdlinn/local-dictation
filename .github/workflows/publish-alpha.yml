@@ -1,5 +1,11 @@
 name: Publish checked alpha packages
 on:
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: Successful Build apps run for the exact alpha-tagged source
+        required: true
+        type: string
   workflow_run:
     workflows: ["Build apps"]
     types: [completed]
@@ -7,18 +13,36 @@ permissions:
   contents: read
 jobs:
   publish:
-    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-24.04
     permissions:
       actions: read
       contents: write
     steps:
+      - name: Validate the completed build and its repository
+        id: checked
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SELECTED_RUN_ID: ${{ inputs.build_run_id || github.event.workflow_run.id }}
+        shell: python
+        run: |
+          import json, os, subprocess
+          repository = os.environ['GITHUB_REPOSITORY']
+          run_id = os.environ['SELECTED_RUN_ID']
+          assert run_id.isdigit(), 'A numeric build run ID is required'
+          run = json.loads(subprocess.check_output(['gh','api',f'repos/{repository}/actions/runs/{run_id}']))
+          workflow = json.loads(subprocess.check_output(['gh','api',f'repos/{repository}/actions/workflows/build-apps.yml']))
+          assert run['workflow_id'] == workflow['id'], 'Unexpected workflow'
+          assert run['status'] == 'completed' and run['conclusion'] == 'success', 'Build checks did not pass'
+          assert run['head_repository']['full_name'] == repository, 'Unexpected source repository'
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+              output.write(f"sha={run['head_sha']}\nrun_id={run_id}\n")
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ steps.checked.outputs.sha }}
       - uses: actions/download-artifact@v4
         with:
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ steps.checked.outputs.run_id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: release-artifacts
       - uses: actions/checkout@v4
@@ -38,8 +62,8 @@ jobs:
       - name: Publish verified packages for their source tag
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
-          BUILD_RUN_ID: ${{ github.event.workflow_run.id }}
+          SOURCE_SHA: ${{ steps.checked.outputs.sha }}
+          BUILD_RUN_ID: ${{ steps.checked.outputs.run_id }}
           REPOSITORY: ${{ github.repository }}
         shell: python
         run: |

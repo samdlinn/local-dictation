@@ -1,14 +1,15 @@
-# Local Dictation alpha
+# Local Dictation 0.1.1 alpha 2
 
-An independent free dictation app built on Handy and Dictus, with optional local Qwen3 cleanup.
+Privacy and reliability fixes for the first alpha. Free local dictation with optional on-device cleanup; no app account, API key, subscription, or hosted inference.
 
-- Desktop builds: configurable dictation shortcuts, local speech models, vocabulary, clipboard insertion, and a local cleanup model manager.
-- Android: offline keyboard dictation, vocabulary, and optional local cleanup under Settings.
-- No app account, API key, paid inference, or automatic update service.
-- Speech models download during setup. Optional AI cleanup is a separate free 1.83 GB download. Both run offline after setup.
+- History-off desktop dictations bypass audio and transcript storage. Pending recordings are deleted on cancellation/failure. Deletion uses SQLite secure deletion.
+- The first launch removes unreferenced app-generated desktop recordings and rebuilds the database once to scrub previously deleted transcript bytes. Explicitly retained history and imported files are preserved; existing backups/snapshots are outside this cleanup.
+- Android diagnostics keep metrics only. Upgrading removes the first alpha's raw diagnostic file and diagnostic cache exports. Native cleanup never logs message bodies or generated tokens.
+- Android cleanup runs in a disposable private worker process, with raw-text fallback on worker error, crash, or deadline. Normal teardown handles partial native allocation safely.
+- Android APKs now use a non-debuggable release build, the same persistent signing identity, and a higher version code so settings/models can survive the update.
+- Dependencies were refreshed; the compatible GLib line includes the upstream security backport. Build gates check advisories, the backport's source checksum, privacy regressions, and APK signature/native-library alignment. Maintenance-only upstream notices remain explicitly tracked.
+- Production desktop webviews now use CSP and recording-directory file access instead of unrestricted file access.
 
-This is an early alpha, not a stable release. Installer builds do not establish microphone, permission, paste, or physical Android compatibility. Review important text; cleanup can make mistakes and uses conservative rejection checks. iPhone is deferred.
+Quit the old desktop app before installing this update. On Android, install the new APK over the previous one. Use only packages from this repository's Releases page. The optional cleanup model remains a separate free 1.83 GB download; models process speech locally after setup.
 
-Mac and Windows packages are not notarized/commercially signed and may display OS installation warnings. Android builds use a persistent development signing key for alpha updates; install only from this repository. Do not use alpha builds for sensitive password fields. Back up locally retained settings before replacing an existing alpha.
-
-The source and licenses are public. Model files remain separate from Git. See README.md, PRIVACY.md, and THIRD_PARTY_NOTICES.md.
+This is an alpha. Automated checks do not establish microphone, shortcut, paste, or physical Android compatibility on your device. Review important text because local cleanup can make mistakes. Mac/Windows installation warnings may appear because these packages have no paid notarization or publisher certificate. iPhone remains deferred.

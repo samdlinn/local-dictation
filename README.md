@@ -12,11 +12,11 @@ Download a package from [Releases](https://github.com/samdlinn/local-dictation/r
 
 | Platform | Package | Status |
 | --- | --- | --- |
-| Apple Silicon Mac | DMG | First local build produced; microphone and paste permissions require a device check |
+| Apple Silicon Mac | DMG | Alpha download available; app startup checked, microphone and paste validation pending |
 | Other Mac builds | DMG for the architecture shown in its filename | Build pipeline |
-| Windows 10 and 11 x64 | Setup EXE | Build pipeline; CPU inference initially |
+| Windows 10 and 11 x64 | Setup EXE | Alpha download available; installation and native startup pass on the Windows runner; Windows 10 device test pending |
 | Ubuntu Linux x64 | DEB or AppImage | Build pipeline; Wayland integration varies by desktop |
-| Android arm64, Android 10+ | APK | Build pipeline; physical-device validation pending |
+| Android arm64, Android 10+ | APK | Alpha download available; build, core tests, signing, and native alignment checked; physical-device validation pending |
 | iPhone | None yet | Optional and deferred; no paid developer membership required by this project |
 
 Mac and Windows may show installation warnings because the alpha has no paid notarization or publisher certificate. Install only assets from this repository. Android APKs use the same private development signing key across alphas so updates can preserve app data.
@@ -37,7 +37,7 @@ All app settings and vocabulary are local. Desktop history defaults to zero reta
 
 Initial targets, to be validated rather than universal guarantees: 8 GB RAM on desktop, 16 GB preferred; a modern arm64 Android device, with 6–8 GB RAM preferred for local cleanup; roughly 3 GB free for the optional cleanup model and processing headroom, in addition to speech models. A dedicated GPU is not required. CPU instruction support and OS versions matter on older machines.
 
-The primary test devices are an M5 MacBook Air with 16 GB and a OnePlus 15. The Windows 10 desktop and physical Android keyboard flow still need end-to-end tests. Small local models can miss corrections or change meaning; this release prioritizes preserving the original transcript when checks fail.
+Initial device targets include an M5 MacBook Air with 16 GB, a OnePlus 15, and a Windows 10 desktop. The physical microphone, shortcut, paste, and Android keyboard flows still need end-to-end tests. Small local models can miss corrections or change meaning; this release prioritizes preserving the original transcript when checks fail.
 
 ## Build from source
 

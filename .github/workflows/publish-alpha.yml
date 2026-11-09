@@ -21,6 +21,19 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: release-artifacts
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: publisher-tools
+          sparse-checkout: scripts
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Sign Android package with the persistent alpha identity
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: python publisher-tools/scripts/sign-android.py release-artifacts/android-arm64/app-debug.apk
       - name: Publish verified packages for their source tag
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

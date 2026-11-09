@@ -80,12 +80,6 @@ jobs:
           packages: platform-tools
       - name: Install Android native tools
         run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0' 'ndk;27.2.12479018' 'cmake;3.31.6' 'cmake;3.22.1'
-      - name: Restore app signing key
-        env:
-          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-        run: |
-          mkdir -p "$HOME/.android"
-          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$HOME/.android/debug.keystore"
       - name: Test and build Android app
         working-directory: android
         run: ./gradlew :app:assembleDebug :core:testDebugUnitTest --no-daemon

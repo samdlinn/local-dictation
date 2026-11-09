@@ -21,6 +21,8 @@ Download a package from [Releases](https://github.com/samdlinn/local-dictation/r
 
 Mac and Windows may show installation warnings because the alpha has no paid notarization or publisher certificate. Install only assets from this repository. Android APKs use the same private development signing key across alphas so updates can preserve app data.
 
+For the Windows 10 desktop, follow the [short Windows test guide](docs/WINDOWS_TEST.md) after the setup EXE is listed in the release.
+
 ### First launch
 
 1. Install and open the app. Allow microphone access and the insertion or keyboard permissions requested by your operating system.
@@ -58,7 +60,7 @@ cd android
 ./gradlew :app:assembleDebug :core:testDebugUnitTest
 ```
 
-A local debug build uses your local Android signing identity. Release APKs use this project's separate development key held in GitHub Actions secrets; the private key is never committed.
+A local debug build uses your local Android signing identity. Before publishing, the release workflow re-signs its APK with this project's persistent development key held in GitHub Actions secrets, verifies the signature and 16 KB native-library ZIP alignment, and discards the temporary key file. The private key is never committed.
 
 ## Verify a change
 
